@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Web", "DevSkill.Inventory.Web\DevSkill.Inventory.Web.csproj", "{D1FBDF64-0246-4F18-9358-42E6F00E787E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1FBDF64-0246-4F18-9358-42E6F00E787E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1FBDF64-0246-4F18-9358-42E6F00E787E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1FBDF64-0246-4F18-9358-42E6F00E787E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1FBDF64-0246-4F18-9358-42E6F00E787E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
