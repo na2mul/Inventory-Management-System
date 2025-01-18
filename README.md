@@ -2,7 +2,7 @@
 
 Manually to set up the database table for logging, I just run the following SQL script:
 
-
+```sql
 CREATE TABLE [Logs] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Message] NVARCHAR(MAX) NULL,
