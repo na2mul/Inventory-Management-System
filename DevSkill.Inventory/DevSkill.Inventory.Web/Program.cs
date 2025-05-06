@@ -10,6 +10,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
 
+#region Bootstrap Logger Configuration
 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
@@ -19,9 +20,7 @@ Log.Logger = new LoggerConfiguration()
              .ReadFrom.Configuration(configuration)
              .CreateBootstrapLogger();
 
-
-    
-
+#endregion  
 
 try
 {
@@ -45,18 +44,6 @@ try
     {
         containerBuilder.RegisterModule(new WebModule());
     });
-
-    //var columnOptions = new ColumnOptions 
-    //{ 
-    //    AdditionalColumns = new Collection<SqlColumn>
-    //    { 
-    //        new SqlColumn { ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 50 }
-    //    } 
-    //};
-    //Log.Logger = new LoggerConfiguration()
-    //    .MinimumLevel.Debug()
-    //    .WriteTo.Console()
-    //    .WriteTo.MSSqlServer(connectionString: "Server=localhost;Database=LogDb;Integrated Security=SSPI;", sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs" }, columnOptions: columnOptions).CreateLogger(); Log.Information("Application started");
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString));
