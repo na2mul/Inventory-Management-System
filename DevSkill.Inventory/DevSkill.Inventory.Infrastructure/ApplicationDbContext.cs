@@ -1,4 +1,5 @@
 ﻿using DevSkill.Inventory.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,21 +9,24 @@ using System.Threading.Tasks;
 
 namespace DevSkill.Inventory.Infrastructure
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         private readonly string _connectionString;
+        private readonly string _migrationAssembly;
+
         public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
 
-        public ApplicationDbContext(string connectionString)
+        public ApplicationDbContext(string connectionString, string migrationAssembly)
         {
             _connectionString = connectionString;
+            _migrationAssembly = migrationAssembly;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer(_connectionString);
+                optionsBuilder.UseSqlServer(_connectionString, (x) => x.MigrationsAssembly(_migrationAssembly));
             base.OnConfiguring(optionsBuilder);
         }
     }

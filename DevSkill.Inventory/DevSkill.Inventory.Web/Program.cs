@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Web;
 using DevSkill.Inventory.Web.Data;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Reflection;
 
 #region Bootstrap Logger Configuration
 var configuration = new ConfigurationBuilder()
@@ -29,7 +31,7 @@ try
 
     // Add services to the container.
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
+    var migrationAssembly = Assembly.GetExecutingAssembly();
     #region serilog configuration
     builder.Host.UseSerilog((context, lc) => lc
         .MinimumLevel.Debug()
@@ -39,21 +41,21 @@ try
     );
     #endregion
 
+    #region Autofac configuration
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     {
-        containerBuilder.RegisterModule(new WebModule());
+        containerBuilder.RegisterModule(new WebModule(connectionString, migrationAssembly?.FullName));
     });
+    #endregion
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
+        options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
     builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
         .AddEntityFrameworkStores<ApplicationDbContext>();
     builder.Services.AddControllersWithViews();
-
-   
 
     var app = builder.Build();
 
