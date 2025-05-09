@@ -5,6 +5,7 @@ using DevSkill.Inventory.Domain.Entities;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class BooksController : Controller
     {
         private readonly IBookService _bookService;
