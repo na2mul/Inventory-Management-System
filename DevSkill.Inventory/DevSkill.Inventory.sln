@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Web", "DevSkill.Inventory.Web\DevSkill.Inventory.Web.csproj", "{D1FBDF64-0246-4F18-9358-42E6F00E787E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{74CA4DB1-F6AB-45A6-9E55-3059C1B00CFC} = {74CA4DB1-F6AB-45A6-9E55-3059C1B00CFC}
+		{96714383-85DF-48EB-9009-FC2187FFA542} = {96714383-85DF-48EB-9009-FC2187FFA542}
+		{E135DFA8-14E9-4A96-9F53-A6F26F19760C} = {E135DFA8-14E9-4A96-9F53-A6F26F19760C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Domain", "DevSkill.Inventory.Domain\DevSkill.Inventory.Domain.csproj", "{E135DFA8-14E9-4A96-9F53-A6F26F19760C}"
 EndProject
