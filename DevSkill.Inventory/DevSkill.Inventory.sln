@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Domain", "DevSkill.Inventory.Domain\DevSkill.Inventory.Domain.csproj", "{E135DFA8-14E9-4A96-9F53-A6F26F19760C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Application", "DevSkill.Inventory.Application\DevSkill.Inventory.Application.csproj", "{74CA4DB1-F6AB-45A6-9E55-3059C1B00CFC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E135DFA8-14E9-4A96-9F53-A6F26F19760C} = {E135DFA8-14E9-4A96-9F53-A6F26F19760C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Infrastructure", "DevSkill.Inventory.Infrastructure\DevSkill.Inventory.Infrastructure.csproj", "{96714383-85DF-48EB-9009-FC2187FFA542}"
 EndProject
