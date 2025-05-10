@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DevSkill.Inventory.Application.Features.Books.Commands;
 using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Web;
 using DevSkill.Inventory.Web.Data;
@@ -46,6 +47,13 @@ try
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     {
         containerBuilder.RegisterModule(new WebModule(connectionString, migrationAssembly?.FullName));
+    });
+    #endregion
+
+    #region MediatR Configuration
+    builder.Services.AddMediatR(cfg => {
+        cfg.RegisterServicesFromAssembly(migrationAssembly);
+        cfg.RegisterServicesFromAssembly(typeof(BookAddCommand).Assembly);
     });
     #endregion
 

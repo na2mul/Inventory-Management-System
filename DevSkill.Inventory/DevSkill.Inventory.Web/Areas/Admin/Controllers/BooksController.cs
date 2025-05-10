@@ -2,35 +2,36 @@
 using Microsoft.AspNetCore.Mvc;
 using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Domain.Entities;
+using DevSkill.Inventory.Application.Features.Books.Commands;
+using MediatR;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class BooksController : Controller
     {
-        private readonly IBookService _bookService;
-        public BooksController(IBookService bookService)
+        private readonly IMediator _mediator;
+        public BooksController(IMediator mediator)
         {
-            _bookService = bookService;
+            _mediator = mediator;
         }
         public IActionResult Index()
         {
-            
             return View();
         }
         public IActionResult Add()
         {
-            var model = new AddBookModel();
+            var model = new BookAddCommand();
             return View(model);
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Add(AddBookModel model)
+        public async Task<IActionResult> Add(BookAddCommand bookAddCommand)
         {
             if (ModelState.IsValid)
             {
-                _bookService.AddBook(new Book { Title = model.Title });
+                await _mediator.Send(bookAddCommand);
             }
-            return View(model);
+            return View(bookAddCommand);
         }
 
     }
