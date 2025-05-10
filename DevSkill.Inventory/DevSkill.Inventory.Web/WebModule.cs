@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using DevSkill.Inventory.Application.Services;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Repositories;
 using DevSkill.Inventory.Domain.Services;
@@ -27,6 +28,8 @@ namespace DevSkill.Inventory.Web
             builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<BookService>().As<IBookService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<AuthorService>().As<IAuthorService>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AuthorRepository>().As<IAuthorRepository>()
                 .InstancePerLifetimeScope();
