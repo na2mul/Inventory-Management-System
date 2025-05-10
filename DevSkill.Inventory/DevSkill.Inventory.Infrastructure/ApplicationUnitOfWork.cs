@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace DevSkill.Inventory.Infrastructure
 {
-    public class ApplicationUnitOfWork : UnitOfWork, Domain.IApplicationUnitOfWork
+    public class ApplicationUnitOfWork : UnitOfWork, IApplicationUnitOfWork
     {
         public IAuthorRepository AuthorRepository { get; set; }
-
         public IBookRepository BookRepository { get; set; }
         private readonly ApplicationDbContext _dbContext;
         public ApplicationUnitOfWork(ApplicationDbContext context, IAuthorRepository authorRepository,
