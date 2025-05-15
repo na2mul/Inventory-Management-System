@@ -1,16 +1,21 @@
-﻿using DevSkill.Inventory.Domain.Entities;
+﻿using Demo.Domain;
+using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Web;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class AuthorsController : Controller
     {
+        private readonly ILogger<AuthorsController> _logger;
         private readonly IAuthorService _authorService;
-        public AuthorsController(IAuthorService authorService)
+        public AuthorsController(ILogger<AuthorsController> logger, IAuthorService authorService)
         {
+            _logger = logger;
             _authorService = authorService;
         }
         public IActionResult Index()
@@ -32,5 +37,34 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
             return View(model);
         }
+
+        [HttpPost]
+        public JsonResult GetAuthorJsonData([FromBody] AuthorListModel model)
+        {
+            try
+            {
+                var (data, total, totalDisplay) = _authorService.GetAuthors(model.PageIndex, model.PageSize, model.FormatSortExpression("Name","Biography","Rating", "Id"), model.Search);
+                var authors = new
+                {
+                    recordstotal = total,
+                    recordsFiltred = totalDisplay,
+                    data = (from record in data
+                            select new string[]
+                            {
+                                HttpUtility.HtmlEncode(record.Name),
+                                HttpUtility.HtmlEncode(record.Biography),
+                                record.Rating.ToString(),
+                                record.Id.ToString()
+                            }).ToArray()
+                };
+                return Json(authors);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "there was a problem getting authors");
+                return Json(DataTables.EmptyResult);
+            }
+
+        }        
     }
 }

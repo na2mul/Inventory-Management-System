@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Demo.Domain;
 
 namespace DevSkill.Inventory.Application.Services
 {
@@ -20,6 +21,12 @@ namespace DevSkill.Inventory.Application.Services
         {
             _applicationUnitOfWork.AuthorRepository.Add(author);
             _applicationUnitOfWork.Save();
+        }
+
+        public (IList<Author> data, int total, int totalDisplay) GetAuthors(int pageIndex, int pageSize,
+            string? order, DataTablesSearch search)
+        {
+           return _applicationUnitOfWork.AuthorRepository.GetPagedAuthors(pageIndex, pageSize, order, search);
         }
     }
 }
