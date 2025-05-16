@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Demo.Domain;
+using DevSkill.Inventory.Application.Exceptions;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
@@ -36,11 +37,22 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var author = _mapper.Map<Author>(model);
-                author.Id = IdentityGenerator.NewSequentialGuid();
-                _authorService.AddAuthor(author);
+                try
+                {
+                    var author = _mapper.Map<Author>(model);
+                    author.Id = IdentityGenerator.NewSequentialGuid();
+                    _authorService.AddAuthor(author);
+                }
+                catch(DuplicateAuthorNameException de)
+                {
+                    ModelState.AddModelError("DuplicateAuthor", de.Message);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to add author");
+                }
             }
-            return View(model);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
