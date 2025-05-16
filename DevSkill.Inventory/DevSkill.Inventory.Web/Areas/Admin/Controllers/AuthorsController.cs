@@ -7,6 +7,7 @@ using DevSkill.Inventory.Web.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Web;
+using DevSkill.Inventory.Infrastructure;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -24,7 +25,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-
             return View();
         }
         public IActionResult Add()
@@ -42,6 +42,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     var author = _mapper.Map<Author>(model);
                     author.Id = IdentityGenerator.NewSequentialGuid();
                     _authorService.AddAuthor(author);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "Author Added",
+                        Type = ResponseTypes.Success
+                    });
                 }
                 catch(DuplicateAuthorNameException de)
                 {
@@ -60,7 +65,8 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         {
             try
             {
-                var (data, total, totalDisplay) = _authorService.GetAuthors(model.PageIndex, model.PageSize, model.FormatSortExpression("Name","Biography","Rating", "Id"), model.Search);
+                var (data, total, totalDisplay) = _authorService.GetAuthors(model.PageIndex, model.PageSize, 
+                    model.FormatSortExpression("Name","Biography","Rating", "Id"), model.Search);
                 var authors = new
                 {
                     recordstotal = total,
