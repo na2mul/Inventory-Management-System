@@ -1,4 +1,4 @@
-﻿using Demo.Domain;
+﻿using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;

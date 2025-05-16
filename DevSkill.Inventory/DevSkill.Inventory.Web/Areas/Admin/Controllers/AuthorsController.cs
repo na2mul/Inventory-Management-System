@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Demo.Domain;
+using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Application.Exceptions;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Domain.Services;

@@ -1,4 +1,4 @@
-﻿using Demo.Domain;
+﻿using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Entities;
 using System;
 using System.Collections.Generic;
