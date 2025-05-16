@@ -1,0 +1,97 @@
+﻿@model UpdateAuthorModel
+@{
+    ViewData["Title"] = "Update Author";
+}
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Update Author</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Update Author</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content Header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row g-4">
+            <!--begin::Col-->
+            <div class="col-12">
+                <partial name="_ResponsePartial" />
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6">
+                <!--begin::Quick Example-->
+                <div class="card card-primary card-outline mb-4">
+                    <!--begin::Header-->
+                    <div class="card-header"><div class="card-title">Update Author</div></div>
+                    <!--end::Header-->
+                    <!--begin::Form-->
+                    <form asp-antiforgery="true" asp-area="Admin" asp-controller="Authors"
+                          asp-action="update" method="post">
+                        <!--begin::Body-->
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label as-for="Name" class="form-label">Author Name</label>
+                                <input type="text"
+                                       class="form-control"
+                                       asp-for="Name"
+                                       aria-describedby="titleHelp" />
+                                <div id="titleHelp" class="form-text">
+                                    Provide a Author Name
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label as-for="Biography" class="form-label">Biography</label>
+                                <input type="text"
+                                       class="form-control"
+                                       asp-for="Biography"
+                                       aria-describedby="titleHelp" />
+                                <div id="titleHelp" class="form-text">
+                                    Provide a Author Biography
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label as-for="Rating" class="form-label">Rating</label>
+                                <input type="text"
+                                       class="form-control"
+                                       asp-for="Rating"
+                                       aria-describedby="titleHelp" />
+                                <div id="titleHelp" class="form-text">
+                                    Provide a Author Rating
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--end::Body-->
+                        <!--begin::Footer-->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                        <!--end::Footer-->
+                    </form>
+                    <!--end::Form-->
+                </div>
+                <!--end::Quick Example-->
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content-->
+
+

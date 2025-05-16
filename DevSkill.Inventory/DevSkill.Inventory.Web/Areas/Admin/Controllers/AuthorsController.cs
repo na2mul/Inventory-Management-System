@@ -70,6 +70,80 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult Update(Guid id)
+        {
+            var model = new UpdateAuthorModel();
+            var author = _authorService.GetAuthor(id);
+            _mapper.Map(author, model);
+
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult Update(UpdateAuthorModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var author = _mapper.Map<Author>(model);
+                    _authorService.Update(author);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "Author Updated",
+                        Type = ResponseTypes.Success
+
+                    });
+                    return RedirectToAction("Index");
+                }
+                catch(DuplicateAuthorNameException de)
+                {
+                    ModelState.AddModelError("DuplicateAuthor", de.Message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Success
+
+                    });
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to update author");
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "Failed to update author",
+                        Type = ResponseTypes.Success
+
+                    });
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                _authorService.DeleteAuthor(id);
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = "Author Deleted",
+                    Type = ResponseTypes.Success
+                });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete author");
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = "Failed to delete author",
+                    Type = ResponseTypes.Danger
+                });
+            }
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
         public JsonResult GetAuthorJsonData([FromBody] AuthorListModel model)
         {

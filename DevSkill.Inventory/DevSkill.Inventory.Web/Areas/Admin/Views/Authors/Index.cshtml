@@ -37,6 +37,7 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <partial name="_ResponsePartial" />
+                        <partial name="_ModalPartial" />
                         <table id = "authors" class="table table-bordered">
                             <thead>
                                 <tr>
@@ -116,6 +117,21 @@
                     }
                 ]
             });
+
+            $('#authors').on('click', '.show-bs-modal', function () {
+                let id = $(this).data("id");
+                let deleteModal = $("#modal-delete");
+                deleteModal.find('.modal-body p').text('Are you sure you want to delete this author?');
+                $('#delete-id').val(id);
+                $('#delete-form').attr('action', '/admin/authors/delete');
+                deleteModal.modal('show');
+            });
+
+            $('#delete-button').click(function()
+            {
+                $('#delete-form').submit();
+            });
+
         });
     </script>
 }
