@@ -51,10 +51,20 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 catch(DuplicateAuthorNameException de)
                 {
                     ModelState.AddModelError("DuplicateAuthor", de.Message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Danger
+                    });
                 }
                 catch(Exception ex)
                 {
                     _logger.LogError(ex, "Failed to add author");
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "Failed to add author",
+                        Type = ResponseTypes.Danger
+                    });
                 }
             }
             return RedirectToAction("Index");
