@@ -1,4 +1,5 @@
-﻿using Demo.Domain;
+﻿using AutoMapper;
+using Demo.Domain;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
@@ -13,10 +14,12 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
     {
         private readonly ILogger<AuthorsController> _logger;
         private readonly IAuthorService _authorService;
-        public AuthorsController(ILogger<AuthorsController> logger, IAuthorService authorService)
+        private readonly IMapper _mapper;
+        public AuthorsController(ILogger<AuthorsController> logger, IAuthorService authorService, IMapper mapper)
         {
             _logger = logger;
             _authorService = authorService;
+            _mapper = mapper;
         }
         public IActionResult Index()
         {
@@ -33,7 +36,9 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _authorService.AddAuthor(new Author { Name = model.Name, Biography = model.Biography, Rating = model.Rating});
+                var author = _mapper.Map<Author>(model);
+                author.Id = IdentityGenerator.NewSequentialGuid();
+                _authorService.AddAuthor(author);
             }
             return View(model);
         }
