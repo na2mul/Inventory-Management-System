@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Demo.Domain
+namespace DevSkill.Inventory.Domain
 {
     public abstract class DataTables
     {

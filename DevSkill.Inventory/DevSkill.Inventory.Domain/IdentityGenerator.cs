@@ -1,5 +1,5 @@
 ﻿
-namespace Demo.Domain
+namespace DevSkill.Inventory.Domain
 {
     public static class IdentityGenerator
     {
