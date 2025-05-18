@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DevSkill.Inventory.Application.Features.Products.Commands;
+using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 
@@ -8,8 +10,8 @@ namespace DevSkill.Inventory.Web
     {
         public WebProfile()
         {
-            CreateMap<AddAuthorModel, Author>().ReverseMap();
-            CreateMap<UpdateAuthorModel, Author>().ReverseMap();
+            CreateMap<ProductAddCommand, Product>().ReverseMap();
+            CreateMap<ProductUpdateCommand, Product>().ReverseMap();                        
         }
     }
 }

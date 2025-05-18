@@ -9,7 +9,6 @@ namespace DevSkill.Inventory.Domain
 {
     public interface IApplicationUnitOfWork : IUnitOfWork
     {
-        public IAuthorRepository AuthorRepository { get; }
-        public IBookRepository BookRepository { get; }
+        public IProductRepository ProductRepository { get; }
     }
 }

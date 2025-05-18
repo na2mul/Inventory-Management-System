@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using DevSkill.Inventory.Application.Features.Books.Commands;
+using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Services;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Repositories;
@@ -28,15 +28,11 @@ namespace DevSkill.Inventory.Web
                 .InstancePerLifetimeScope();
             builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<BookService>().As<IBookService>()
+            builder.RegisterType<ProductService>().As<IProductService>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<AuthorService>().As<IAuthorService>()
+            builder.RegisterType<ProductRepository>().As<IProductRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<AuthorRepository>().As<IAuthorRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<BookRepository>().As<IBookRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<BookAddCommand>().AsSelf();
+            builder.RegisterType<ProductAddCommand>().AsSelf();
 
             base.Load(builder);
         }

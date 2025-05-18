@@ -11,15 +11,13 @@ namespace DevSkill.Inventory.Infrastructure
 {
     public class ApplicationUnitOfWork : UnitOfWork, IApplicationUnitOfWork
     {
-        public IAuthorRepository AuthorRepository { get; set; }
-        public IBookRepository BookRepository { get; set; }
+        public IProductRepository ProductRepository { get; set; }
         private readonly ApplicationDbContext _dbContext;
-        public ApplicationUnitOfWork(ApplicationDbContext context, IAuthorRepository authorRepository,
-            IBookRepository bookRepository) : base(context)
+        public ApplicationUnitOfWork(ApplicationDbContext context, IProductRepository productRepository)
+            : base(context)
         {
             _dbContext = context;
-            AuthorRepository = authorRepository;
-            BookRepository = bookRepository;
+            ProductRepository = productRepository;
         }
 
        
