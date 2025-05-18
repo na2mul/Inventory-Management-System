@@ -1,6 +1,8 @@
 ﻿using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Repositories;
+using DevSkill.Inventory.Domain.Utilities;
 using DevSkill.Inventory.Infrastructure.Repositories;
+using DevSkill.Inventory.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,9 +15,11 @@ namespace DevSkill.Inventory.Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DbContext _dbContext;
+        protected ISqlUtility SqlUtility { get; private set; }
         public UnitOfWork(DbContext context)
         {
-            _dbContext = context; 
+            _dbContext = context;
+            SqlUtility = new SqlUtility(_dbContext.Database.GetDbConnection());
         }
         public void Save()
         {

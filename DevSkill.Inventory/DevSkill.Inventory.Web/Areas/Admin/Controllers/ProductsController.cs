@@ -11,6 +11,7 @@ using DevSkill.Inventory.Infrastructure;
 using MediatR;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
+using DevSkill.Inventory.Domain.Dtos;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -20,11 +21,13 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly ILogger<ProductsController> _logger;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public ProductsController(ILogger<ProductsController> logger, IMapper mapper, IMediator mediator)
+        private readonly IProductService _productService;
+        public ProductsController(ILogger<ProductsController> logger, IMapper mapper, IMediator mediator, IProductService productService)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
+            _productService = productService;
         }
         public IActionResult Index()
         {
@@ -146,12 +149,15 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetProductJsonData([FromBody] ProductGetListQuery productQuery)
+        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductListModel model)
         {
             try
             {
-
-                var (data, total, totalDisplay) = await _mediator.Send(productQuery);
+                var searchDto = _mapper.Map<ProductSearchDto>(model.SearchItem);
+                var (data, total, totalDisplay) = await _productService.GetProductsSP(
+                    model.PageIndex,
+                    model.PageSize,
+                    model.FormatSortExpression("Name", "Price", "StockQuantity", "Description", "Id"), searchDto);
                 var products = new
                 {
                     recordstotal = total,

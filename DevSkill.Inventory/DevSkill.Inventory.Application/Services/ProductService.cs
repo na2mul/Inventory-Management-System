@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DevSkill.Inventory.Application.Exceptions;
+using DevSkill.Inventory.Domain.Dtos;
 
 namespace DevSkill.Inventory.Application.Services
 {
@@ -43,6 +44,12 @@ namespace DevSkill.Inventory.Application.Services
             string? order, DataTablesSearch search)
         {
             return _applicationUnitOfWork.ProductRepository.GetPagedProducts(pageIndex, pageSize, order, search);
+        }
+
+        public async Task<(IList<Product> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
+            string? order, ProductSearchDto search)
+        {
+            return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
         }
 
         public void Update(Product author)
