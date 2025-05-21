@@ -282,6 +282,141 @@ namespace Assignment2
         }
         #endregion
 
+        #region Delete
+        public void Delete(T item)
+        {
+            using (SqlConnection connection = new SqlConnection(DbConnectionString.connection))
+            {
+                try
+                {
+                    connection.Open();
+                    // Start a transaction to ensure all operations succeed or fail together
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            // Process the entire object graph and build SQL commands
+                            DeleteTable(connection, item);
+
+                            foreach (var insertValue in commandQueue)
+                            {
+                                using (SqlCommand command = new SqlCommand(insertValue, connection, transaction))
+                                {
+                                    command.ExecuteNonQuery();
+                                    Console.WriteLine("Record deleted Successfully");
+                                }
+                            }
+                            foreach (var insertValue in commandQueue2.AsEnumerable().Reverse())
+                            {
+                                using (SqlCommand command = new SqlCommand(insertValue, connection, transaction))
+                                {
+                                    command.ExecuteNonQuery();
+                                    Console.WriteLine("Record deleted Successfully");
+                                }
+                            }
+                            // If everything went well, commit the transaction
+                            transaction.Commit();
+                            Console.WriteLine("All records deleted successfully");
+                        }
+                        catch (Exception ex)
+                        {
+                            // If something went wrong, roll back the transaction
+                            transaction.Rollback();
+                            Console.WriteLine($"Error occurred: {ex.Message}");
+                            throw;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Connection error: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+        public void DeleteTable(SqlConnection connection, object obj)
+        {
+            if (obj == null)
+                return;
+
+            var propertiesInfo = obj.GetType().GetProperties();
+            string column = $"delete from {obj.GetType().Name} ";
+            string condition = null;
+
+            foreach (var property in propertiesInfo)
+            {
+                if (property.Name == "Id")
+                {
+                    condition = $" where id = '{property.GetValue(obj)}'";
+                    continue;
+                }
+                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType) && property.PropertyType != typeof(string))
+                {
+                    var enumerable = property.GetValue(obj) as IEnumerable;
+
+                    if (enumerable != null)
+                    {
+                        foreach (var item in enumerable)
+                        {
+                            if (item.GetType().IsClass && item.GetType() != typeof(string))
+                            {
+                                ChildDeleteTable(connection, item);
+
+                            }
+                        }
+                    }
+                }
+                else if (property.PropertyType != typeof(string) && property.PropertyType.IsClass)
+                {
+                    DeleteTable(connection, property.GetValue(obj));
+
+                }
+            }
+            string insertValue = $"{column}{condition}";
+            commandQueue2.Add(insertValue);
+        }
+
+        public void ChildDeleteTable(SqlConnection connection, object obj)
+        {
+            if (obj == null)
+                return;
+
+            var propertiesInfo = obj.GetType().GetProperties();
+            string column = $"delete from {obj.GetType().Name} ";
+            string condition = null;
+
+            foreach (var property in propertiesInfo)
+            {
+                if (property.Name == "Id")
+                {
+                    condition = $" where id = '{property.GetValue(obj)}'";
+                    continue;
+                }
+                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType) && property.PropertyType != typeof(string))
+                {
+                    var enumerable = property.GetValue(obj) as IEnumerable;
+
+                    if (enumerable != null)
+                    {
+                        foreach (var item in enumerable)
+                        {
+                            if (item.GetType().IsClass && item.GetType() != typeof(string))
+                            {
+                                ChildDeleteTable(connection, item);
+                            }
+                        }
+                    }
+                }
+                else if (property.PropertyType != typeof(string) && property.PropertyType.IsClass)
+                {
+                    ChildDeleteTable(connection, property.GetValue(obj));
+                }
+            }
+            string insertValue = $"{column}{condition}";
+            commandQueue.Add(insertValue);
+        }
+        #endregion
+
 
 
         private string GetSqlType(Type type)
