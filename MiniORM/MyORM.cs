@@ -14,6 +14,8 @@ namespace Assignment2
     {
         private List<string> commandQueue = new List<string>();
         private List<string> commandQueue2 = new List<string>();
+
+        #region Insert
         public void Insert(T item)
         {
             commandQueue.Clear();
@@ -184,6 +186,103 @@ namespace Assignment2
 
             return currentId;
         }
+        #endregion
+
+        #region Update
+        public void Update(T item)
+        {
+
+            using (SqlConnection connection = new SqlConnection(DbConnectionString.connection))
+            {
+
+                try
+                {
+                    connection.Open();
+
+                    UpdateTable(connection, item);
+                    Console.WriteLine("All records Updated successfully");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Connection error: {ex.Message}");
+                    throw;
+                }
+
+            }
+        }
+
+        public void UpdateTable(SqlConnection connection, object obj)
+        {
+            if (obj == null)
+                return;
+
+            var propertiesInfo = obj.GetType().GetProperties();
+            string column = $"update {obj.GetType().Name} set ";
+            string condition = null;
+
+            foreach (var property in propertiesInfo)
+            {
+                if (property.Name == "Id")
+                {
+                    condition = $" where id = '{property.GetValue(obj)}'";
+                    continue;
+                }
+                if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType) && property.PropertyType != typeof(string))
+                {
+                    var enumerable = property.GetValue(obj) as IEnumerable;
+
+                    if (enumerable != null)
+                    {
+                        foreach (var item in enumerable)
+                        {
+                            if (item.GetType().IsClass && item.GetType() != typeof(string))
+                            {
+                                UpdateTable(connection, item);
+
+
+                            }
+                        }
+                    }
+                }
+                else if (property.PropertyType != typeof(string) && property.PropertyType.IsClass)
+                {
+                    UpdateTable(connection, property.GetValue(obj));
+
+                }
+                else
+                {
+                    column += $"{property.Name}='{property.GetValue(obj)}',";
+                }
+
+
+            }
+            column = column.TrimEnd(',');
+            string insertValue = $"{column}{condition}";
+
+            // Start a transaction to ensure all operations succeed or fail together
+            using (SqlTransaction transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    using (SqlCommand command = new SqlCommand(insertValue, connection, transaction))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    // If everything went well, commit the transaction
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // If something went wrong, roll back the transaction
+                    transaction.Rollback();
+                    Console.WriteLine($"Error occurred: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+        #endregion
+
+
 
         private string GetSqlType(Type type)
         {
