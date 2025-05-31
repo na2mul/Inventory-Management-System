@@ -149,15 +149,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductListModel model)
+        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductGetListQuery model)
         {
             try
             {
-                var searchDto = _mapper.Map<ProductSearchDto>(model.SearchItem);
-                var (data, total, totalDisplay) = await _productService.GetProductsSP(
-                    model.PageIndex,
-                    model.PageSize,
-                    model.FormatSortExpression("Name", "Price", "StockQuantity", "Description", "Id"), searchDto);
+                var (data, total, totalDisplay) = await _mediator.Send(model);
                 var products = new
                 {
                     recordstotal = total,
