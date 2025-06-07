@@ -1,5 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DevSkill.Inventory.Application.Features.Products.Commands;
+using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Web;
 using DevSkill.Inventory.Web.Data;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +11,9 @@ using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Reflection;
 
+#region Bootstrap Logger Configuration
 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
@@ -19,9 +23,7 @@ Log.Logger = new LoggerConfiguration()
              .ReadFrom.Configuration(configuration)
              .CreateBootstrapLogger();
 
-
-    
-
+#endregion  
 
 try
 {
@@ -30,7 +32,7 @@ try
 
     // Add services to the container.
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
+    var migrationAssembly = Assembly.GetExecutingAssembly();
     #region serilog configuration
     builder.Host.UseSerilog((context, lc) => lc
         .MinimumLevel.Debug()
@@ -40,33 +42,32 @@ try
     );
     #endregion
 
+    #region Autofac configuration
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     {
-        containerBuilder.RegisterModule(new WebModule());
+        containerBuilder.RegisterModule(new WebModule(connectionString, migrationAssembly?.FullName));
     });
+    #endregion
 
-    //var columnOptions = new ColumnOptions 
-    //{ 
-    //    AdditionalColumns = new Collection<SqlColumn>
-    //    { 
-    //        new SqlColumn { ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 50 }
-    //    } 
-    //};
-    //Log.Logger = new LoggerConfiguration()
-    //    .MinimumLevel.Debug()
-    //    .WriteTo.Console()
-    //    .WriteTo.MSSqlServer(connectionString: "Server=localhost;Database=LogDb;Integrated Security=SSPI;", sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs" }, columnOptions: columnOptions).CreateLogger(); Log.Information("Application started");
+    #region MediatR Configuration
+    builder.Services.AddMediatR(cfg => {
+        cfg.RegisterServicesFromAssembly(migrationAssembly);
+        cfg.RegisterServicesFromAssembly(typeof(ProductAddCommand).Assembly);
+    });
+    #endregion
+
+    #region Automapper Configuration
+    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+    #endregion
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
+        options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
     builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
         .AddEntityFrameworkStores<ApplicationDbContext>();
     builder.Services.AddControllersWithViews();
-
-   
 
     var app = builder.Build();
 

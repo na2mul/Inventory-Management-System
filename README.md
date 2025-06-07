@@ -1,6 +1,6 @@
 ## Database Setup
 
-Manually to set up the database table for logging, I just run the following SQL script:
+To Manually set up the database table for logging using Serilog, just run the following SQL script:
 
 ```sql
 CREATE TABLE [Logs] (
