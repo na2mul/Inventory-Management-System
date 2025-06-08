@@ -52,11 +52,11 @@ namespace DevSkill.Inventory.Application.Services
             return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
         }
 
-        public void Update(Product author)
+        public void Update(Product product)
         {
-            if (!_applicationUnitOfWork.ProductRepository.IsNameDuplicate(author.Name, author.Id))
+            if (!_applicationUnitOfWork.ProductRepository.IsNameDuplicate(product.Name, product.Id))
             {
-                _applicationUnitOfWork.ProductRepository.Update(author);
+                _applicationUnitOfWork.ProductRepository.Update(product);
                 _applicationUnitOfWork.Save();
             }
             else
