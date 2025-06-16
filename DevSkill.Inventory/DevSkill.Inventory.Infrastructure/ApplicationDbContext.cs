@@ -1,4 +1,5 @@
 ﻿using DevSkill.Inventory.Domain.Entities;
+using DevSkill.Inventory.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +10,11 @@ using System.Threading.Tasks;
 
 namespace DevSkill.Inventory.Infrastructure
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser,
+        ApplicationRole, Guid,
+        ApplicationUserClaim, ApplicationUserRole,
+        ApplicationUserLogin, ApplicationRoleClaim,
+        ApplicationUserToken>
     {
         private readonly string _connectionString;
         private readonly string _migrationAssembly;

@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DevSkill.Inventory.Infrastructure.Extensions;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Web;
@@ -12,6 +13,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
+using DevSkill.Inventory.Domain;
 
 #region Bootstrap Logger Configuration
 var configuration = new ConfigurationBuilder()
@@ -61,13 +63,17 @@ try
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     #endregion
 
+    #region Identity Configuration
+    builder.Services.AddIdentity();
+    #endregion
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-        .AddEntityFrameworkStores<ApplicationDbContext>();
     builder.Services.AddControllersWithViews();
+    builder.Services.AddRazorPages();
+    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
     var app = builder.Build();
 
