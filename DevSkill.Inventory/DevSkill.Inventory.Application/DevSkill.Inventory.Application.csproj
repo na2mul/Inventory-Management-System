@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DevSkill.Inventory.Domain\DevSkill.Inventory.Domain.csproj" />
+    <ProjectReference Include="..\DevSkill.Inventory.Infrastructure\DevSkill.Inventory.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,6 +16,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                 	@PageSize int , 
                 	@OrderBy nvarchar(50),
                 	@Name nvarchar(max) = '%',
+                	@CategoryName nvarchar(max) = '%',
                 	@Description nvarchar(max) = '%',
                 	@PriceFrom int = NULL,
                 	@PriceTo int = NULL,
@@ -35,9 +36,10 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                 	Select @Total = count(*) from Products;
 
                 	-- Collecting Total Display
-                	SET @countsql = 'select @TotalDisplay = count(*) from Products p where 1 = 1 ';
+                	SET @countsql = 'select @TotalDisplay = count(*) from Products p inner join Category c on p.CategoryId = c.Id where 1 = 1 ';
 
                 	SET @countsql = @countsql + ' AND p.Name LIKE ''%'' + @xName + ''%''' 
+                	SET @countsql = @countsql + ' AND c.CategoryName LIKE ''%'' + @xCategoryName + ''%''' 
 
                 	SET @countsql = @countsql + ' AND p.Description LIKE ''%'' + @xDescription + ''%''' 
 
@@ -48,6 +50,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                 	SET @countsql = @countsql + ' AND p.Price <= @xPriceTo' 
 
                 	SELECT @countparamlist = '@xName nvarchar(max),
+                		@xCategoryName nvarchar(max),
                 		@xDescription nvarchar(max),
                 		@xPriceFrom int,
                 		@xPriceTo int,
@@ -55,15 +58,19 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                 	exec sp_executesql @countsql , @countparamlist ,
                 		@Name,
+                		@CategoryName,
                 		@Description,
                 		@PriceFrom,
                 		@PriceTo,
                 		@TotalDisplay = @TotalDisplay output;
 
                 	-- Collecting Data
-                	SET @sql = 'select * from Products p where 1 = 1 ';
+                	SET @sql = 'select p.Id, p.ImageUrl, p.Barcode, p.Name, c.CategoryName,
+                				p.PurchasePrice, p.MRP, p.WholesalePrice, p.Stock, p.LowStock, p.DamageStock
+                				from Products p inner join Category c on p.CategoryId = c.Id where 1 = 1 ';
 
-                	SET @sql = @sql + ' AND p.Name LIKE ''%'' + @xName + ''%''' 
+                	SET @sql = @sql + ' AND p.Name LIKE ''%'' + @xName + ''%'''
+                	SET @sql = @sql + ' AND c.CategoryName LIKE ''%'' + @xCategoryName + ''%''' 
 
                 	SET @sql = @sql + ' AND p.Description LIKE ''%'' + @xDescription + ''%''' 
 
@@ -77,6 +84,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                 	ROWS FETCH NEXT @PageSize ROWS ONLY';
 
                 	SELECT @paramlist = '@xName nvarchar(max),
+                		@xCategoryName nvarchar(max),
                 		@xDescription nvarchar(max),
                 		@xPriceFrom int,
                 		@xPriceTo int,
@@ -85,6 +93,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                 	exec sp_executesql @sql , @paramlist ,
                 		@Name,
+                		@CategoryName,
                 		@Description,
                 		@PriceFrom,
                 		@PriceTo,

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Application.Exceptions;
-using DevSkill.Inventory.Domain.Entities;
-using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -11,7 +9,9 @@ using DevSkill.Inventory.Infrastructure;
 using MediatR;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
-using DevSkill.Inventory.Domain.Dtos;
+using DevSkill.Inventory.Application.Features.Categories.Queries;
+using DevSkill.Inventory.Domain.Entities;
+using Microsoft.AspNetCore.Hosting;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -21,32 +21,53 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly ILogger<ProductsController> _logger;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IProductService _productService;
-        public ProductsController(ILogger<ProductsController> logger, IMapper mapper, IMediator mediator, IProductService productService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ProductsController(ILogger<ProductsController> logger, IMapper mapper,
+            IMediator mediator, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
-            _productService = productService;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
             return View();
         }
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            var model = new ProductAddCommand();
+            var model = new AddProductModel();
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categoryList = await _mediator.Send(new CategoryGetQuery());
+            return Json(categoryList);
+        }
+
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(ProductAddCommand model)
+        public async Task<IActionResult> Add(AddProductModel model)
         {
             if (ModelState.IsValid)
             {
+                var product = _mapper.Map<ProductAddCommand>(model);
+                if (model.Image != null)
+                {
+                    string folder = "Images/Products/";
+                    folder += Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                    model.ImageUrl = folder;
+                    string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
+
+                    await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                    product.ImageUrl = model.ImageUrl;
+                }
                 try
                 {
-                    model.Id = IdentityGenerator.NewSequentialGuid();
-                    await _mediator.Send(model);
+                    product.Id = IdentityGenerator.NewSequentialGuid();
+                    await _mediator.Send(product);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
                         Message = "product Added",
@@ -149,11 +170,12 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductGetListQuery model)
+        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductListModel model)
         {
             try
             {
-                var (data, total, totalDisplay) = await _mediator.Send(model);
+                var productQuery = _mapper.Map<ProductGetListQuery>(model);
+                var (data, total, totalDisplay) = await _mediator.Send(productQuery);
                 var products = new
                 {
                     recordstotal = total,
@@ -161,10 +183,17 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     data = (from record in data
                             select new string[]
                             {
+                                record.Id.ToString(),
+                                $"<img src='{"/" + HttpUtility.HtmlDecode(record.ImageUrl ?? string.Empty)}' alt='Image' width='80' height='70'/>",
+                                HttpUtility.HtmlEncode(record.Barcode),
                                 HttpUtility.HtmlEncode(record.Name),
-                                record.Price.ToString(),
-                                record.StockQuantity.ToString(),
-                                HttpUtility.HtmlEncode(record.Description),
+                                HttpUtility.HtmlEncode(record.CategoryName),
+                                HttpUtility.HtmlEncode(record.PurchasePrice),
+                                HttpUtility.HtmlEncode(record.MRP),
+                                HttpUtility.HtmlEncode(record.WholesalePrice),
+                                HttpUtility.HtmlEncode(record.Stock),
+                                HttpUtility.HtmlEncode(record.LowStock),
+                                HttpUtility.HtmlEncode(record.DamageStock),
                                 record.Id.ToString()
                             }).ToArray()
                 };
@@ -175,7 +204,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 _logger.LogError(ex, "there was a problem getting products");
                 return Json(DataTables.EmptyResult);
             }
-
         }
     }
 }

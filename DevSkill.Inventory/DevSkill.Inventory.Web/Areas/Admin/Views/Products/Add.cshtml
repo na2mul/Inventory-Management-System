@@ -1,108 +1,143 @@
-﻿@using DevSkill.Inventory.Application.Features.Products.Commands
-@model ProductAddCommand
-@{
-    ViewData["Title"] = "Add Product";
-}
+﻿@model AddProductModel
 
-<!--begin::App Content Header-->
-<div class="app-content-header">
-    <!--begin::Container-->
-    <div class="container-fluid">
-        <!--begin::Row-->
-        <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0">Add Product</h3></div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Add Product</li>
-                </ol>
+<!-- Modal -->
+
+<div class="modal fade bs-example-modal-product_add" id="AddProductModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: aliceblue;">
+                <h4 class="modal-title">New Product Information</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
-        </div>
-        <!--end::Row-->
-    </div>
-    <!--end::Container-->
-</div>
-<!--end::App Content Header-->
-<!--begin::App Content-->
-<div class="app-content">
-    <!--begin::Container-->
-    <div class="container-fluid">
-        <!--begin::Row-->
-        <div class="row g-4">
-            <!--begin::Col-->
-            <div class="col-12">
-                <partial name="_ResponsePartial" />
-            </div>
-            <!--end::Col-->
-            <!--begin::Col-->
-            <div class="col-md-6">
-                <!--begin::Quick Example-->
-                <div class="card card-primary card-outline mb-4">
-                    <!--begin::Header-->
-                    <div class="card-header"><div class="card-title">Add a new Product</div></div>
-                    <!--end::Header-->
-                    <!--begin::Form-->
-                    <form asp-antiforgery="true" asp-area="Admin" asp-controller="Products"
-                          asp-action="Add" method="post">
-                        <!--begin::Body-->
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label as-for="Name" class="form-label">Product Name</label>
-                                <input type="text"
-                                       class="form-control"
-                                       asp-for="Name"
-                                       aria-describedby="titleHelp" />
-                                <div id="titleHelp" class="form-text">
-                                    Provide a Product Name
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label as-for="Price" class="form-label">Price</label>
-                                <input type="number"
-                                       class="form-control"
-                                       asp-for="Price"
-                                       aria-describedby="titleHelp" />
-                                <div id="titleHelp" class="form-text">
-                                    Provide a Product Price
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label as-for="StockQuantity" class="form-label">StockQuantity</label>
-                                <input type="number"
-                                       class="form-control"
-                                       asp-for="StockQuantity"
-                                       aria-describedby="titleHelp" />
-                                <div id="titleHelp" class="form-text">
-                                    Provide a Product StockQuantity
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label as-for="Description" class="form-label">Description</label>
-                                <input type="text"
-                                       class="form-control"
-                                       asp-for="Description"
-                                       aria-describedby="titleHelp" />
-                                <div id="titleHelp" class="form-text">
-                                    Provide a Product Description
-                                </div>
-                            </div>
-                           
+            <form asp-antiforgery="true" asp-area="Area" asp-controller="Products" asp-action="Add" id="addProductForm"
+                method="POST" enctype="multipart/form-data">
+                <div class="row" style="padding:20px;">
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="Name" class="form-label">Product Name *</label>
+                        <input type="text"
+                               asp-for="Name" 
+                               class="form-control"
+                               aria-describedby="NameHelp"
+                               />
+                        <div id="NameHelp" class="form-text">
+                            Provide a Product Name
                         </div>
-                        <!--end::Body-->
-                        <!--begin::Footer-->
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label asp-for="Barcode" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <img src="~/icons/barcode.png" alt="icon" style="width:18px;height:18px;">
+                            </span>
+                            <input type="number"
+                                   class="form-control"
+                                   asp-for="Barcode"
+                                   id="barcode-field"
+                                   placeholder="Barcode">
+                            <button type="button"
+                                    class="btn btn-info"
+                                    id="generate-barcode">
+                                Generate
+                            </button>
                         </div>
-                        <!--end::Footer-->
-                    </form>
-                    <!--end::Form-->
+                    </div>
+ 
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="CategoryId">Category *</label>
+                        <select asp-for="CategoryId" class="form-control select2" id="categoryId" name="categoryId" >
+                            <option selected value="">Select an category *</option>
+                            <option value="newCategory">New Category</option>
+                        </select>
+                    </div>
+                    <div class="d-none" id="newCategory">
+                        <div class="form-group col-md-12 col-sm-12 col-12">
+                            <label>New Category </label>
+                            <input type="text" class="form-control" name="newCategory" placeholder="New Category *" id="newcat">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="MeasurementUnitId">Unit *</label>
+                        <select asp-for="MeasurementUnitId" class="form-control select2" id="MeasurementUnitId" name="MeasurementUnitId" >
+                            <option selected value="">Select an unit *</option>
+                            <option value="newUnit">New Unit</option>
+                        </select>
+                    </div>
+                    <div class="d-none" id="newUnit">
+                        <div class="form-group col-md-12 col-sm-12 col-12">
+                            <label>New Unit </label>
+                            <input type="text" class="form-control" name="newUnit" placeholder="New Unit *" id="newut">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="PurchasePrice">Purchase price </label>
+                        <input asp-for="PurchasePrice"
+                               type="number"
+                               class="form-control"
+                               placeholder="Purchase price">
+                    </div>
+
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="MRP">MRP Price</label>
+                        <input asp-for="MRP"
+                               type="number" 
+                               class="form-control"
+                               placeholder="MRP Price">
+                    </div>
+
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="WholesalePrice">Wholesale Price</label>
+                        <input  asp-for = "WholesalePrice"
+                            type="number" 
+                            class="form-control" 
+                            placeholder="Wholesale Price">
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="Stock">Total Stock</label>
+                        <input asp-for="Stock"
+                               type="number"
+                               class="form-control"
+                               placeholder="Total Stock">
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="LowStock">Low Stock</label>
+                        <input asp-for="LowStock" 
+                               type="number"
+                               class="form-control"
+                               placeholder="Low Stock">
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="DamageStock">Damage Stock</label>
+                        <input asp-for="DamageStock"
+                               type="number"
+                               class="form-control"
+                               placeholder="damage stock">
+                    </div>
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="Description">Description</label>
+                        <input asp-for="Description"
+                               type="text" 
+                               class="form-control">
+                    </div>
+
+                    <div class="form-group col-md-6 col-sm-12 col-12">
+                        <label asp-for="Image">
+                            Product Image 
+                            <small style="color: red; font-size:10px">( Maximum image size 500kb and png, jpg format )</small>
+                        </label>
+                        <input asp-for="Image"
+                               type="file"
+                               onchange="previewImage(event)">
+                    </div>
+                    <div id="image-preview" class="col-md-6 col-sm-12 col-12"></div>
                 </div>
-                <!--end::Quick Example-->
-            </div>
-            <!--end::Row-->
+                <div class="modal-footer" style="background-color: aliceblue;">
+                    <button type="button" class="btn btn-secondary btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-square"></i>&nbsp;&nbsp;Cancel</button>
+                    <button type="button" id="add-button" class="btn btn-primary"><i class="bi bi-floppy"></i>&nbsp;&nbsp;Submit</button>
+                </div>
+            </form>
         </div>
-        <!--end::Container-->
     </div>
-    <!--end::App Content-->
+</div>
 
 

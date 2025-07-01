@@ -15,7 +15,7 @@ namespace DevSkill.Inventory.Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DbContext _dbContext;
-        protected ISqlUtility SqlUtility { get; private set; }
+        public ISqlUtility SqlUtility { get; private set; }
         public UnitOfWork(DbContext context)
         {
             _dbContext = context;

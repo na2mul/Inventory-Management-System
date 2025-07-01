@@ -1,5 +1,4 @@
-﻿@using DevSkill.Inventory.Application.Features.Products.Queries
-@model ProductGetListQuery
+﻿
 @{
     ViewData["Title"] = "Index";
 }
@@ -26,57 +25,23 @@
     <!--end::Container-->
 </div>
 <!--end::App Content Header-->
+<div class="card-header">
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            
+        </div>
+        <div class="col-sm-12 col-md-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddProductModal">
+                <i class="bi bi-plus"></i>Add Product
+            </button>
+        </div>
+    </div>
+</div>
+
 <!--begin::App Content-->
 <div class="app-content">
     <!--begin::Container-->
     <div class="container-fluid">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-search mr-1"></i>Search Product</h3>
-
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" asp-for="SearchItem.Name" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Description</label>
-                                <input type="text" asp-for="SearchItem.Description" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Price From</label>
-                                <input type="number" asp-for="SearchItem.PriceFrom" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Price To</label>
-                                <input type="number" asp-for="SearchItem.PriceTo" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer">
-                    <button id="searchButton" type="submit" class="btn btn-primary float-right">Search</button>
-                </div>
-            </div>
-        </div>
         <!--begin::Row-->
         <div class="row">
             <div class="col-md-12">
@@ -84,15 +49,23 @@
                     <div class="card-header"><h3 class="card-title">Available Products</h3></div>
                     <!-- /.card-header -->
                     <div class="card-body">
+                        <partial name="./Add" />
                         <partial name="_ResponsePartial" />
                         <partial name="_ModalPartial" />
-                        <table id = "products" class="table table-bordered">
+                        <table id="products" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Price</th>
-                                    <th>StockQuantity</th>
-                                    <th>Description</th> 
+                                    <th>#SN.</th>
+                                    <th>Image</th>
+                                    <th>Barcode</th>
+                                    <th>Name</th> 
+                                    <th>Category</th>
+                                    <th>Purchase</th>
+                                    <th>MRP</th>
+                                    <th>Wholesale</th>
+                                    <th>Stock</th>
+                                    <th>Low Stock</th>
+                                    <th>Damage Stock</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -100,10 +73,17 @@
                             </tbody>
                             <tfoot>
                                 <tr>
+                                    <th>#SN.</th>
+                                    <th>Image</th>
+                                    <th>Barcode</th>
                                     <th>Name</th>
-                                    <th>Price</th>
-                                    <th>StockQuantity</th>
-                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Purchase</th>
+                                    <th>MRP</th>
+                                    <th>Wholesale</th>
+                                    <th>Stock</th>
+                                    <th>Low Stock</th>
+                                    <th>Damage Stock</th>
                                     <th>Action</th>
                                 </tr>
                             </tfoot>
@@ -124,14 +104,16 @@
 @section Scripts{
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+
     <script>
         $(function () {
             $("#products").DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
+                responsive : true,
                 lengthChange: true,
                 autoWidth: false,
+                searching: false,
                 lengthMenu: [
                     [10, 25, 50, -1],
                     [10, 25, 50, 'All']
@@ -153,24 +135,53 @@
                 },
                 columnDefs: [
                     {
+                        //use for left align view
+                        targets: "_all",          
+                        className: 'dt-left'
+                    },                    
+                    {
                         orderable: false,
-                        targets: 4,
+                        targets: 0,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        orderable: false,
+                        targets: 1
+                    },
+                    {
+                        orderable: false,
+                        targets: -1,
                         render: function (data, type, row) {
                             console.log(type);
-                            return `<button type="submit" class="btn btn-info btn-sm" onclick="window.location.href='/admin/products/update/${data}'" value='${data}'>
-                                                <i class="fas fa-pencil-alt">
-                                                </i>
-                                                Edit
-                                            </button>
-                                            <button type="submit" class="btn btn-danger btn-sm show-bs-modal" data-id='${data}' value='${data}'>
-                                                <i class="fas fa-trash">
-                                                </i>
-                                                Delete
-                                            </button>`;
+                            return `
+                                <div class="d-flex justify-content-center">
+                                    <div class="dropdown ms-auto">
+                                                <i class="bi bi-three-dots" data-bs-toggle="dropdown"
+                                                aria-expanded="false" role="button" title="Action"></i>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <button type="submit" class="dropdown-item"
+                                                    onclick="window.location.href='/admin/products/update/${data}'" value='${data}' title="Edit">
+                                                    <i class="default-color bi bi-pencil-square"></i>
+                                                    Edit</button>
+                                                </li>
+                                                <li>
+                                                    <button type="submit" class="dropdown-item
+                                                    show-bs-modal" data-id='${data}' value='${data}'
+                                                    title="Delete">
+                                                    <i class="red-color bi bi-trash"></i>
+                                                    Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                </div>`;
                         }
                     }
                 ]
-            });
+            }); 
 
             $('#products').on('click', '.show-bs-modal', function () {
                 let id = $(this).data("id");
@@ -185,6 +196,64 @@
             {
                 $('#delete-form').submit();
             });
+            
+            //Generate barcode
+            document.getElementById('generate-barcode').addEventListener('click', () => {
+                const val = Math.floor(100000000000 + Math.random() * 900000000000);
+                document.getElementById('barcode-field').value = val;
+            });
+
+            //Get category
+            $(document).ready(function () {
+                $('#AddProductModal').on('show.bs.modal', function () {
+                    $.ajax({
+                        url: '/Admin/Products/GetCategories',
+                        method: 'GET',
+                        success: function (data) {
+                            const $dropdown = $('#categoryId');
+                            $dropdown.empty();
+                            $dropdown.append(`<option>Select a category</option>`);
+                            $.each(data, function (i, item) {
+                                $dropdown.append(`<option value="${item.id}">${item.categoryName}</option>`);
+                            });
+                        },
+                        error: function () {
+                            alert('Failed to load categories.');
+                        }
+                    });
+                    $('#addProductForm').attr('action', '/admin/products/add');
+                });
+            });
+            $('#add-button').click(function()
+            {
+                $('#addProductForm').submit();
+            });
+
+            // Update Product
+            $(document).ready(function () {
+                $('#UpdateProductModal').on('show.bs.modal', function () {
+                    $.ajax({
+                        url: '/Admin/Products/GetCategories',
+                        method: 'GET',
+                        success: function (data) {
+                            const $dropdown = $('#categoryId');
+                            $dropdown.empty();
+                            $dropdown.append(`<option>Select a category</option>`);
+                            $.each(data, function (i, item) {
+                                $dropdown.append(`<option value="${item.id}">${item.categoryName}</option>`);
+                            });
+                        },
+                        error: function () {
+                            alert('Failed to load categories.');
+                        }
+                    });
+                    $('#addProductForm').attr('action', '/admin/products/add');
+                });
+            });
+            $('#add-button').click(function()
+            {
+                $('#addProductForm').submit();
+            });
 
             $("#searchButton").click(function () {
                 $('#products').DataTable().ajax.reload(null, false);
@@ -193,3 +262,6 @@
         });
     </script>
 }
+
+
+

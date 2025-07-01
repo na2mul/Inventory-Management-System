@@ -46,11 +46,11 @@ namespace DevSkill.Inventory.Application.Services
             return _applicationUnitOfWork.ProductRepository.GetPagedProducts(pageIndex, pageSize, order, search);
         }
 
-        public async Task<(IList<Product> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
-            string? order, ProductSearchDto search)
-        {
-            return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
-        }
+        //public async Task<(IList<ProductListDto> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
+        //    string? order, ProductSearchDto search)
+        //{
+        //    //return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
+        //}
 
         public void Update(Product product)
         {

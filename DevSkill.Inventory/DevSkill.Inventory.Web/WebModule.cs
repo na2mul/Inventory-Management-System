@@ -34,6 +34,8 @@ namespace DevSkill.Inventory.Web
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProductRepository>().As<IProductRepository>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<CategoryRepository>().As<ICategoryRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<EmailUtility>().As<IEmailUtility>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProductAddCommand>().AsSelf();
