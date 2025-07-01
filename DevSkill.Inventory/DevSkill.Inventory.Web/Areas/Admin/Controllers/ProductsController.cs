@@ -12,6 +12,7 @@ using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Application.Features.Categories.Queries;
 using DevSkill.Inventory.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
+using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -46,6 +47,13 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         {
             var categoryList = await _mediator.Send(new CategoryGetQuery());
             return Json(categoryList);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMeasurementUnits()
+        {
+            var MeasurementUnitList = await _mediator.Send(new MeasurementUnitGetQuery());
+            return Json(MeasurementUnitList);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -178,15 +186,15 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 var (data, total, totalDisplay) = await _mediator.Send(productQuery);
                 var products = new
                 {
-                    recordstotal = total,
+                    recordsTotal = total,
                     recordsFiltred = totalDisplay,
                     data = (from record in data
                             select new string[]
                             {
                                 record.Id.ToString(),
                                 $"<img src='{"/" + HttpUtility.HtmlDecode(record.ImageUrl ?? string.Empty)}' alt='Image' width='80' height='70'/>",
-                                HttpUtility.HtmlEncode(record.Barcode),
                                 HttpUtility.HtmlEncode(record.Name),
+                                HttpUtility.HtmlEncode(record.Barcode),                                
                                 HttpUtility.HtmlEncode(record.CategoryName),
                                 HttpUtility.HtmlEncode(record.PurchasePrice),
                                 HttpUtility.HtmlEncode(record.MRP),

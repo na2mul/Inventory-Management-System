@@ -57,8 +57,8 @@
                                 <tr>
                                     <th>#SN.</th>
                                     <th>Image</th>
-                                    <th>Barcode</th>
                                     <th>Name</th> 
+                                    <th>Barcode</th>
                                     <th>Category</th>
                                     <th>Purchase</th>
                                     <th>MRP</th>
@@ -74,9 +74,9 @@
                             <tfoot>
                                 <tr>
                                     <th>#SN.</th>
-                                    <th>Image</th>
-                                    <th>Barcode</th>
+                                    <th>Image</th>                                    
                                     <th>Name</th>
+                                    <th>Barcode</th>
                                     <th>Category</th>
                                     <th>Purchase</th>
                                     <th>MRP</th>
@@ -222,6 +222,26 @@
                         }
                     });
                     $('#addProductForm').attr('action', '/admin/products/add');
+                });
+            });            
+            //Get measurement unit
+            $(document).ready(function () {
+                $('#AddProductModal').on('show.bs.modal', function () {
+                    $.ajax({
+                        url: '/Admin/Products/GetMeasurementUnits',
+                        method: 'GET',
+                        success: function (data) {
+                            const $dropdown = $('#measurementUnitId');
+                            $dropdown.empty();
+                            $dropdown.append(`<option>Select a Unit</option>`);
+                            $.each(data, function (i, item) {
+                                $dropdown.append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        },
+                        error: function () {
+                            alert('Failed to load categories.');
+                        }
+                    });
                 });
             });
             $('#add-button').click(function()
