@@ -10,9 +10,8 @@ using MediatR;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Application.Features.Categories.Queries;
-using DevSkill.Inventory.Domain.Entities;
-using Microsoft.AspNetCore.Hosting;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
+using DevSkill.Inventory.Infrastructure.Utilities;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -23,59 +22,38 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IImageUtility _imageUtility;
 
-        public ProductsController(ILogger<ProductsController> logger, IMapper mapper,
-            IMediator mediator, IWebHostEnvironment webHostEnvironment)
+        public ProductsController(
+            ILogger<ProductsController> logger,
+            IMapper mapper,
+            IMediator mediator,
+            IWebHostEnvironment webHostEnvironment,
+            IImageUtility imageUtility)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
             _webHostEnvironment = webHostEnvironment;
+            _imageUtility = imageUtility;
         }
         public IActionResult Index()
         {
             return View();
-        }
-        public async Task<IActionResult> Add()
-        {
-            var model = new AddProductModel();
-            return View(model);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetCategories()
-        {
-            var categoryList = await _mediator.Send(new CategoryGetQuery());
-            return Json(categoryList);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetMeasurementUnits()
-        {
-            var MeasurementUnitList = await _mediator.Send(new MeasurementUnitGetQuery());
-            return Json(MeasurementUnitList);
-        }
-
+        }      
+        
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(AddProductModel model)
+        public async Task<IActionResult> AddAsync(AddProductModel model)
         {
             if (ModelState.IsValid)
             {
-                var product = _mapper.Map<ProductAddCommand>(model);
-                if (model.Image != null)
-                {
-                    string folder = "Images/Products/";
-                    folder += Guid.NewGuid().ToString() + "_" + model.Image.FileName;
-                    model.ImageUrl = folder;
-                    string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
-
-                    await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
-                    product.ImageUrl = model.ImageUrl;
-                }
                 try
                 {
+                    var product = _mapper.Map<ProductAddCommand>(model);
+                    product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     product.Id = IdentityGenerator.NewSequentialGuid();
                     await _mediator.Send(product);
+
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
                         Message = "product Added",
@@ -104,23 +82,17 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Update(Guid id)
-        {
-            var model = new ProductUpdateCommand();
-            var product = await _mediator.Send(new ProductGetQuery() { Id = id });
-            _mapper.Map(product, model);
-
-            return View(model);
-        }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductUpdateCommand model)
+        public async Task<IActionResult> UpdateAsync(UpdateProductModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _mediator.Send(model);
+                    var product = _mapper.Map<ProductUpdateCommand>(model);
+                    product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
+                    await _mediator.Send(product);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
                         Message = "product Updated",
@@ -154,7 +126,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try
             {
@@ -178,7 +150,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductListModel model)
+        public  async Task<JsonResult> GetProductJsonDataAsync([FromBody] ProductListModel model)
         {
             try
             {
@@ -213,5 +185,75 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(DataTables.EmptyResult);
             }
         }
+        public async Task<JsonResult> GetProductForUpdateAsync(Guid id)
+        {
+            try
+            {
+                var product = await _mediator.Send(new ProductGetQuery() { Id = id });
+
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "Product not found" });
+                }
+                var model = _mapper.Map<UpdateProductModel>(product);
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = model.Id,
+                        name = model.Name,
+                        barcode = model.Barcode,
+                        categoryId = model.CategoryId,
+                        measurementUnitId = model.MeasurementUnitId,
+                        purchasePrice = model.PurchasePrice,
+                        mrp = model.MRP,
+                        wholesalePrice = model.WholesalePrice,
+                        stock = model.Stock,
+                        lowStock = model.LowStock,
+                        damageStock = model.DamageStock,
+                        description = model.Description,
+                        imageUrl = model.ImageUrl
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting products";
+                _logger.LogError(ex, error);
+                return Json(new { success = false,message = error});
+            }
+        }
+        public async Task<IActionResult> GetCategoriesAsync()
+        {
+            try
+            {
+                var categoryList = await _mediator.Send(new CategoryGetQuery());
+                return Json(categoryList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting Categories";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
+
+        public async Task<IActionResult> GetMeasurementUnitsAsync()
+        {
+            try
+            {
+                var MeasurementUnitList = await _mediator.Send(new MeasurementUnitGetQuery());
+                return Json(MeasurementUnitList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting Measurement units";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
+        
     }
-}
+}      

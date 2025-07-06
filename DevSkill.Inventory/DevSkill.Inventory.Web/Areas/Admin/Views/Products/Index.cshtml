@@ -50,6 +50,7 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <partial name="./Add" />
+                        <partial name="./Update" />
                         <partial name="_ResponsePartial" />
                         <partial name="_ModalPartial" />
                         <table id="products" class="table table-bordered">
@@ -116,7 +117,7 @@
                 searching: false,
                 lengthMenu: [
                     [10, 25, 50, -1],
-                    [10, 25, 50, 'All']
+                    [10, 25, 50, "All"]
                 ],
                 ajax: {
                     url: "/Admin/Products/GetProductJsonData",
@@ -135,11 +136,12 @@
                 },
                 columnDefs: [
                     {
-                        //use for left align view
+                        //use for left alignment view
                         targets: "_all",          
                         className: 'dt-left'
                     },                    
-                    {
+                    {   
+                        //use for showing sequential id number
                         orderable: false,
                         targets: 0,
                         render: function (data, type, row, meta) {
@@ -162,18 +164,17 @@
                                                 aria-expanded="false" role="button" title="Action"></i>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <button type="submit" class="dropdown-item"
-                                                    onclick="window.location.href='/admin/products/update/${data}'" value='${data}' title="Edit">
-                                                    <i class="default-color bi bi-pencil-square"></i>
-                                                    Edit</button>
+                                                    <button type="submit" class="dropdown-item showUpdateModal"
+                                                        data-id='${data}' value='${data}' title="Edit">
+                                                        <i class="default-color bi bi-pencil-square"></i>
+                                                    Edit </button>
                                                 </li>
                                                 <li>
                                                     <button type="submit" class="dropdown-item
-                                                    show-bs-modal" data-id='${data}' value='${data}'
-                                                    title="Delete">
-                                                    <i class="red-color bi bi-trash"></i>
-                                                    Delete
-                                                    </button>
+                                                        show-bs-modal" data-id='${data}' value='${data}'
+                                                        title="Delete">
+                                                        <i class="red-color bi bi-trash"></i>
+                                                    Delete </button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -181,7 +182,8 @@
                         }
                     }
                 ]
-            }); 
+            });
+
 
             $('#products').on('click', '.show-bs-modal', function () {
                 let id = $(this).data("id");
@@ -196,83 +198,118 @@
             {
                 $('#delete-form').submit();
             });
+
             
+            $(document).on('click', '.showUpdateModal', function () {
+                const id = $(this).data('id');     
+                Update(id);
+            });
+            
+
             //Generate barcode
-            document.getElementById('generate-barcode').addEventListener('click', () => {
-                const val = Math.floor(100000000000 + Math.random() * 900000000000);
-                document.getElementById('barcode-field').value = val;
+            document.querySelectorAll('.generate-barcode').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const code = Math.floor(1e11 + Math.random() * 9e11);  
+                    btn.closest('.modal')           
+                        .querySelector('.barcode')   
+                        .value = code;              
+                });
             });
 
-            //Get category
-            $(document).ready(function () {
-                $('#AddProductModal').on('show.bs.modal', function () {
-                    $.ajax({
-                        url: '/Admin/Products/GetCategories',
-                        method: 'GET',
-                        success: function (data) {
-                            const $dropdown = $('#categoryId');
-                            $dropdown.empty();
-                            $dropdown.append(`<option>Select a category</option>`);
-                            $.each(data, function (i, item) {
-                                $dropdown.append(`<option value="${item.id}">${item.categoryName}</option>`);
-                            });
-                        },
-                        error: function () {
-                            alert('Failed to load categories.');
-                        }
-                    });
-                    $('#addProductForm').attr('action', '/admin/products/add');
+            //Get Categories
+            function loadCategories($dropdown, selectedId = '') {
+              return $.getJSON('/Admin/Products/GetCategories')
+                .done(function (list) {
+                  $dropdown.empty().append('<option value="">Select a category *</option>');
+
+                  list.forEach(function (c) {
+                    $dropdown.append(`<option value="${c.id}">${c.categoryName}</option>`);
+                  });
+
+                  if (selectedId) {
+                    $dropdown.val(selectedId).trigger('change');
+                  }
+                })
+                .fail(function () {
+                  alert('Failed to load categories.');
                 });
-            });            
-            //Get measurement unit
-            $(document).ready(function () {
-                $('#AddProductModal').on('show.bs.modal', function () {
-                    $.ajax({
-                        url: '/Admin/Products/GetMeasurementUnits',
-                        method: 'GET',
-                        success: function (data) {
-                            const $dropdown = $('#measurementUnitId');
-                            $dropdown.empty();
-                            $dropdown.append(`<option>Select a Unit</option>`);
-                            $.each(data, function (i, item) {
-                                $dropdown.append(`<option value="${item.id}">${item.name}</option>`);
-                            });
-                        },
-                        error: function () {
-                            alert('Failed to load categories.');
-                        }
-                    });
+            }
+
+            //Get Units
+            function loadMeasurementUnits($dropdown, selectedId = '') {
+              return $.getJSON('/Admin/Products/GetMeasurementUnits')
+                .done(function (list) {
+                  $dropdown.empty().append('<option value="">Select a measurement unit *</option>');
+
+                  list.forEach(function (u) {
+                    $dropdown.append(`<option value="${u.id}">${u.name}</option>`);
+                  });
+
+                  if (selectedId) {
+                    $dropdown.val(selectedId).trigger('change');
+                  }
+                })
+                .fail(function () {
+                  alert('Failed to load measurement units.');
                 });
+            }
+
+            //update
+            function Update(id) {
+              const $modal     = $('#updateProductModal');
+              const $catSelect = $modal.find('.category-select');
+              const $muSelect  = $modal.find('.measurementUnit-select');
+
+              $.ajax({
+                url: '/Admin/Products/GetProductForUpdate',
+                type: 'GET',
+                data: { id },
+                dataType: 'json'
+              })
+                .done(function (resp) {
+                  const p = resp.data || resp; 
+
+                  $modal.find('#Id').val(p.id);
+                  $modal.find('#Name').val(p.name);
+                  $modal.find('#Barcode').val(p.barcode);
+                  $modal.find('#PurchasePrice').val(p.purchasePrice);
+                  $modal.find('#MRP').val(p.mrp);
+                  $modal.find('#WholesalePrice').val(p.wholesalePrice);
+                  $modal.find('#Stock').val(p.stock);
+                  $modal.find('#LowStock').val(p.lowStock);
+                  $modal.find('#DamageStock').val(p.damageStock);
+                  $modal.find('#Description').val(p.description);
+                  $modal.find('#ImageUrl').val(p.imageUrl);
+
+                  $.when(
+                    loadCategories($catSelect, p.categoryId),
+                    loadMeasurementUnits($muSelect, p.measurementUnitId)
+                  ).then(function () {
+                    $modal.modal('show');
+                  });
+                })
+                .fail(function () {
+                  alert('Could not load product for editing.');
+                });
+            }
+
+            // Add Product modal 
+            $('#AddProductModal').on('show.bs.modal', function () {
+              const $catSelect = $(this).find('.category-select');
+              const $muSelect  = $(this).find('.measurementUnit-select');
+
+              loadCategories($catSelect);      
+              loadMeasurementUnits($muSelect); 
             });
+
             $('#add-button').click(function()
             {
                 $('#addProductForm').submit();
             });
 
-            // Update Product
-            $(document).ready(function () {
-                $('#UpdateProductModal').on('show.bs.modal', function () {
-                    $.ajax({
-                        url: '/Admin/Products/GetCategories',
-                        method: 'GET',
-                        success: function (data) {
-                            const $dropdown = $('#categoryId');
-                            $dropdown.empty();
-                            $dropdown.append(`<option>Select a category</option>`);
-                            $.each(data, function (i, item) {
-                                $dropdown.append(`<option value="${item.id}">${item.categoryName}</option>`);
-                            });
-                        },
-                        error: function () {
-                            alert('Failed to load categories.');
-                        }
-                    });
-                    $('#addProductForm').attr('action', '/admin/products/add');
-                });
-            });
-            $('#add-button').click(function()
+            $('#update-button').click(function()
             {
-                $('#addProductForm').submit();
+                $('#updateProductForm').submit();
             });
 
             $("#searchButton").click(function () {

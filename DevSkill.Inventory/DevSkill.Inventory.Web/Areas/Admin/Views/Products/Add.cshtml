@@ -7,9 +7,9 @@
         <div class="modal-content">
             <div class="modal-header" style="background-color: aliceblue;">
                 <h4 class="modal-title">New Product Information</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-antiforgery="true" asp-area="Area" asp-controller="Products" asp-action="Add" id="addProductForm"
+            <form asp-antiforgery="true" asp-area="Admin" asp-controller="Products" asp-action="Add" id="addProductForm"
                 method="POST" enctype="multipart/form-data">
                 <div class="row" style="padding:20px;">
                     <div class="form-group col-md-6 col-sm-12 col-12">
@@ -30,13 +30,11 @@
                                 <img src="~/icons/barcode.png" alt="icon" style="width:18px;height:18px;">
                             </span>
                             <input type="number"
-                                   class="form-control"
+                                   class="form-control barcode"
                                    asp-for="Barcode"
-                                   id="barcode-field"
                                    placeholder="Barcode">
                             <button type="button"
-                                    class="btn btn-info"
-                                    id="generate-barcode">
+                                    class="btn btn-info generate-barcode">
                                 Generate
                             </button>
                         </div>
@@ -44,7 +42,7 @@
  
                     <div class="form-group col-md-6 col-sm-12 col-12">
                         <label asp-for="CategoryId">Category *</label>
-                        <select asp-for="CategoryId" class="form-control select2" id="categoryId" name="categoryId" >
+                        <select asp-for="CategoryId" class="form-control select2 category-select">
                             <option selected value="">Select an category *</option>
                             <option value="newCategory">New Category</option>
                         </select>
@@ -57,7 +55,7 @@
                     </div>
                     <div class="form-group col-md-6 col-sm-12 col-12">
                         <label asp-for="MeasurementUnitId">Unit *</label>
-                        <select asp-for="MeasurementUnitId" class="form-control select2" id="measurementUnitId" name="measurementUnitId" >
+                        <select asp-for="MeasurementUnitId" class="form-control select2 measurementUnit-select">
                             <option selected value="">Select an unit *</option>
                             <option value="newUnit">New Unit</option>
                         </select>

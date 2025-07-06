@@ -28,18 +28,14 @@ namespace DevSkill.Inventory.Web
                 .WithParameter("connectionString", _connectionString)
                 .WithParameter("migrationAssembly", _migrationAssembly)
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProductService>().As<IProductService>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProductRepository>().As<IProductRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<CategoryRepository>().As<ICategoryRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<MeasurementUnitRepository>().As<IMeasurementUnitRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<EmailUtility>().As<IEmailUtility>()
-                .InstancePerLifetimeScope();
+            builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductRepository>().As<IProductRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<CategoryRepository>().As<ICategoryRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<MeasurementUnitRepository>().As<IMeasurementUnitRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
+            builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
+
             builder.RegisterType<ProductAddCommand>().AsSelf();
 
             base.Load(builder);

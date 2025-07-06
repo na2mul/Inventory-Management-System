@@ -12,10 +12,17 @@ namespace DevSkill.Inventory.Web
         public WebProfile()
         {
             CreateMap<ProductAddCommand, Product>().ReverseMap();
-            CreateMap<ProductUpdateCommand, Product>().ReverseMap();
-            CreateMap<ProductSearchModel, ProductSearchDto>().ReverseMap();
             CreateMap<ProductAddCommand, AddProductModel>().ReverseMap();
+            CreateMap<ProductSearchModel, ProductSearchDto>().ReverseMap();
+            CreateMap<ProductUpdateCommand, Product>().ReverseMap();
+            CreateMap<ProductUpdateCommand, UpdateProductModel>().ReverseMap();
+            CreateMap<UpdateProductModel, Product>().ReverseMap();
             CreateMap<ProductGetListQuery, ProductListModel>().ReverseMap();
+            
+            
+
+
+
         }
     }
 }
