@@ -123,11 +123,9 @@
                             Product Image 
                             <small style="color: red; font-size:10px">( Maximum image size 500kb and png, jpg format )</small>
                         </label>
-                        <input asp-for="Image"
-                               type="file"
-                               onchange="previewImage(event)">
+                        <input asp-for="Image" type="file" accept=".png,.jpg,.jpeg">
                     </div>
-                    <div id="image-preview" class="col-md-6 col-sm-12 col-12"></div>
+                    
                 </div>
                 <div class="modal-footer" style="background-color: aliceblue;">
                     <button type="button" class="btn btn-secondary btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-square"></i>&nbsp;&nbsp;Cancel</button>

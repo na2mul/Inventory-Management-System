@@ -311,6 +311,39 @@
             {
                 $('#updateProductForm').submit();
             });
+            
+            // Image Validation 
+            document.addEventListener('change', function (e) {
+                const input = e.target;
+                if (!(input.matches && input.matches('input[type="file"]#Image'))) return;
+
+                // Remove any previous error message
+                const next = input.nextElementSibling;
+                if (next && next.classList.contains('image-error')) next.remove();
+
+                const file = input.files[0];
+                if (!file) return;
+
+                const allowed = ['image/png', 'image/jpeg'];
+                const maxBytes = 512000; 
+                let message = '';
+
+                if (!allowed.includes(file.type)) {
+                message = 'PNG or JPG only';
+                } else if (file.size > maxBytes) {
+                message = 'Max Size 500 KB';
+                }
+
+                if (message) {
+                const span = document.createElement('span');
+                span.textContent = message;
+                span.className = 'image-error text-danger small';
+                // Insert the error message after the input 
+                input.parentNode.insertBefore(span, input.nextSibling);
+                // Clear the invalid file so user must reselect
+                input.value = '';
+                }
+            });
 
             $("#searchButton").click(function () {
                 $('#products').DataTable().ajax.reload(null, false);
