@@ -20,6 +20,8 @@ namespace DevSkill.Inventory.Web
             CreateMap<ProductGetListQuery, ProductListModel>().ReverseMap();
             CreateMap<ProductStoreCommand, Product>().ReverseMap();
             CreateMap<ProductStoreCommand, StoreProductModel>().ReverseMap();
+            CreateMap<ProductDamageCommand, Product>().ReverseMap();
+            CreateMap<ProductDamageCommand, DamageProductModel>().ReverseMap();
 
 
 

@@ -29,19 +29,20 @@
 <div class="card-header">
     <div class="row">
         <div class="col-sm-12 col-md-10">
-            
+            <!-- Optional content -->
         </div>
-        <div class="col-sm-12 col-md-2 d-flex justify-content-end">
-            <button type="button" class="btn bg-orange btn-primary" data-bs-toggle="modal" data-bs-target="#storeProductModal">
-                <i class="bi bi-plus"></i>
-                Store Product
+        <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">
+            <button type="button" class="btn btn-sm btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#damageProductModal">
+                <i class="bi bi-dash me-1"></i>Damage Product
             </button>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddProductModal">
-                <i class="bi bi-plus"></i>Add Product
-            </button>           
+            <button type="button" class="btn btn-sm btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#storeProductModal">
+                <i class="bi bi-plus me-1"></i>Store Product
+            </button>
+            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#AddProductModal">
+                <i class="bi bi-plus me-1"></i>Add Product
+            </button>
         </div>
     </div>
-
 </div>
 
 <!--begin::App Content-->
@@ -57,6 +58,7 @@
                     <div class="card-body">
                         <partial name="./_Add" />
                         <partial name="./_Store" />
+                        <partial name="./_Damage" />
                         <partial name="./_Update" />
                         <partial name="_ResponsePartial" />
                         <partial name="_DeleteModalPartial" />

@@ -140,7 +140,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     {
                         Message = "product Stored",
                         Type = ResponseTypes.Success
-
                     });
                     return RedirectToAction("Index");
                 }                
@@ -152,7 +151,36 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     {
                         Message = message,
                         Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return View(model);
+        }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DamageAsync(DamageProductModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var product = _mapper.Map<ProductDamageCommand>(model);
+                    await _mediator.Send(product);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "damage product Stored",
+                        Type = ResponseTypes.Success
+                    });
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    string message = "Failed to store damage product";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
+                        Type = ResponseTypes.Danger
                     });
                 }
             }

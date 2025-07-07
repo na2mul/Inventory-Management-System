@@ -116,15 +116,18 @@
                 alert('Failed to load products.');
             });
     }
-    $('#storeProductModal').on('shown.bs.modal', function () {
-        const $select = $(this).find('.product-select');
+
+    // Get Products for both Modals
+    $('#damageProductModal, #storeProductModal').on('shown.bs.modal', function () {
+        const $modal = $(this);            
+        const $select = $modal.find('.product-select');
 
         if (!$select.hasClass('select2-hidden-accessible')) {
-            loadProducts($select).then(function () {
+            loadProducts($select).then(() => {
                 $select.select2({
                     allowClear: true,
                     width: '100%',
-                    dropdownParent: $('#storeProductModal')
+                    dropdownParent: $modal 
                 });
             });
         }
@@ -134,13 +137,10 @@
         $('#storeProductForm').submit();
     });
 
-    //to negative
-    //document.getElementById("stockInput").addEventListener("input", function (e) {
-    //    let value = parseFloat(e.target.value);
-    //    if (!isNaN(value) && value > 0) {
-    //        e.target.value = -Math.abs(value);
-    //    }
-    //});
+    $('#damage-button').click(function () {
+        $('#damageProductForm').submit();
+    });
+  
 
     //Get Categories
     function loadCategories($dropdown, selectedId = '') {
