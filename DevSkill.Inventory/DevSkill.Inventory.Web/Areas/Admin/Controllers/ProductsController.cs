@@ -40,8 +40,8 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         public IActionResult Index()
         {
             return View();
-        }      
-        
+        }             
+       
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAsync(AddProductModel model)
         {
@@ -71,10 +71,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to add product");
+                    string message = "Failed to add product";
+                    _logger.LogError(ex, message);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
-                        Message = "Failed to add product",
+                        Message = message,
                         Type = ResponseTypes.Danger
                     });
                 }
@@ -113,10 +114,43 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to update product");
+                    string message = "Failed to update product";
+                    _logger.LogError(ex, message);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
-                        Message = "Failed to update product",
+                        Message = message,
+                        Type = ResponseTypes.Danger
+
+                    });
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> StoreAsync(StoreProductModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var product = _mapper.Map<ProductStoreCommand>(model);                    
+                    await _mediator.Send(product);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "product Stored",
+                        Type = ResponseTypes.Success
+
+                    });
+                    return RedirectToAction("Index");
+                }                
+                catch (Exception ex)
+                {
+                    string message = "Failed to store product";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
                         Type = ResponseTypes.Danger
 
                     });
@@ -254,6 +288,22 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(new { success = false, message = error });
             }
         }
-        
+
+        public async Task<IActionResult> GetProductsAsync()
+        {
+            try
+            {
+                var ProductsList = await _mediator.Send(new ProductGetAllQuery());
+                return Json(ProductsList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting products";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
+
+
     }
 }      

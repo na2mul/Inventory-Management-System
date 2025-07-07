@@ -18,8 +18,10 @@ namespace DevSkill.Inventory.Web
             CreateMap<ProductUpdateCommand, UpdateProductModel>().ReverseMap();
             CreateMap<UpdateProductModel, Product>().ReverseMap();
             CreateMap<ProductGetListQuery, ProductListModel>().ReverseMap();
-            
-            
+            CreateMap<ProductStoreCommand, Product>().ReverseMap();
+            CreateMap<ProductStoreCommand, StoreProductModel>().ReverseMap();
+
+
 
 
 

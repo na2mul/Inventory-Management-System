@@ -5,6 +5,7 @@
 
 @section Styles{
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 }
 <!--begin::App Content Header-->
 <div class="app-content-header">
@@ -31,11 +32,16 @@
             
         </div>
         <div class="col-sm-12 col-md-2 d-flex justify-content-end">
+            <button type="button" class="btn bg-orange btn-primary" data-bs-toggle="modal" data-bs-target="#storeProductModal">
+                <i class="bi bi-plus"></i>
+                Store Product
+            </button>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddProductModal">
                 <i class="bi bi-plus"></i>Add Product
-            </button>
+            </button>           
         </div>
     </div>
+
 </div>
 
 <!--begin::App Content-->
@@ -50,6 +56,7 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <partial name="./_Add" />
+                        <partial name="./_Store" />
                         <partial name="./_Update" />
                         <partial name="_ResponsePartial" />
                         <partial name="_DeleteModalPartial" />
@@ -104,7 +111,8 @@
 
 @section Scripts{
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/productIndex.js"></script>    
 }
 

@@ -47,5 +47,10 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
             else
                 return GetCount(x => x.Name == name) > 0;
         }
+
+        public async Task<IList<Product>> ProductGetAllAsync()
+        {
+            return await GetAllAsync();
+        }
     }
 }

@@ -3,8 +3,10 @@ using MediatR;
 
 namespace DevSkill.Inventory.Application.Features.Products.Commands
 {
-    public class ProductDeleteCommand : IRequest, IProductDeleteCommand
+    public class ProductStoreCommand : IRequest, IProductStoreCommand
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; }       
+        public int? Stock { get; set; }
+        
     }
 }
