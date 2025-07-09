@@ -1,11 +1,12 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
 }
 
 @section Styles{
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css"/>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />   
 }
 <!--begin::App Content Header-->
 <div class="app-content-header">
@@ -26,6 +27,7 @@
     <!--end::Container-->
 </div>
 <!--end::App Content Header-->
+
 <div class="card-header">
     <div class="row">
         <div class="col-sm-12 col-md-10">
@@ -33,41 +35,113 @@
         </div>
         <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">
             <button type="button" class="btn btn-sm btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#damageProductModal">
-                <i class="bi bi-dash me-1"></i>Damage Product
+                <i class="fas fa-minus me-1"></i>Damage Product
             </button>
             <button type="button" class="btn btn-sm btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#storeProductModal">
-                <i class="bi bi-plus me-1"></i>Store Product
+                <i class="fas fa-plus me-1"></i>Store Product
             </button>
             <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#AddProductModal">
-                <i class="bi bi-plus me-1"></i>Add Product
+                <i class="fas fa-plus me-1"></i>Add Product
             </button>
         </div>
     </div>
 </div>
 
-<!--begin::App Content-->
 <div class="app-content">
-    <!--begin::Container-->
     <div class="container-fluid">
-        <!--begin::Row-->
+
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Available Products</h3></div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
+
+                <!-- Advance Search -->
+                <div class="card shadow mb-4 collapsed-card">
+                    <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center rounded-top">
+                        <h5 class="mb-0 text-dark">
+                            <i class="fas fa-search me-2 text-muted"></i>Advanced Product Search
+                        </h5>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-card-widget="collapse"
+                                title="Collapse / Expand">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>  
+                    </div>
+                    
+                    <div class="card-body bg-light-subtle px-4">
+
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Product Name</label>
+                                <input id="SearchItem_Name" name="SearchItem_Name"
+                                       class="form-control shadow-sm" placeholder="Enter product name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Category</label>
+                                <input id="SearchItem_CategoryName" name="SearchItem_CategoryName"
+                                       class="form-control shadow-sm" placeholder="Enter category name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Unit</label>
+                                <input id="SearchItem_MeasurementUnitName" name="SearchItem_MeasurementUnitName"
+                                       class="form-control shadow-sm" placeholder="Enter unit name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Barcode</label>
+                                <input id="SearchItem_Barcode" name="SearchItem_Barcode"
+                                       class="form-control shadow-sm" placeholder="Enter barcode" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">PurchasePrice From</label>
+                                <input type="number" id="SearchItem_PurchasePriceFrom" name="SearchItem_PurchasePriceFrom"
+                                       class="form-control shadow-sm" placeholder="Min PurchasePrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">PurchasePrice To</label>
+                                <input type="number" id="SearchItem_PurchasePriceTo" name="SearchItem_PurchasePriceTo"
+                                       class="form-control shadow-sm" placeholder="Max PurchasePrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Available Stock From</label>
+                                <input type="number" id="SearchItem_StockFrom" name="SearchItem_StockFrom"
+                                       class="form-control shadow-sm" placeholder="Min Stock" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Available Stock To</label>
+                                <input type="number" id="SearchItem_StockTo" name="SearchItem_StockTo"
+                                       class="form-control shadow-sm" placeholder="Max Stock" />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-3">                            
+                            <button class="btn btn-outline-secondary btn-sm" id="btnClearFilters">
+                                <i class="fas fa-broom me-1"></i>Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Advance Search card -->
+                <!-- Products Table -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">Available Products</h3>
+                    </div>
+                    
+                    <div class="card-body table-responsive px-4">
                         <partial name="./_Add" />
                         <partial name="./_Store" />
                         <partial name="./_Damage" />
                         <partial name="./_Update" />
                         <partial name="_ResponsePartial" />
                         <partial name="_DeleteModalPartial" />
-                        <table id="products" class="table table-bordered">
+
+                        <table id="products" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
                                     <th>#SN.</th>
                                     <th>Image</th>
-                                    <th>Name</th> 
+                                    <th>Name</th>
                                     <th>Barcode</th>
                                     <th>Category</th>
                                     <th>Purchase</th>
@@ -79,12 +153,11 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
+                            <tbody></tbody>
                             <tfoot>
                                 <tr>
                                     <th>#SN.</th>
-                                    <th>Image</th>                                    
+                                    <th>Image</th>
                                     <th>Name</th>
                                     <th>Barcode</th>
                                     <th>Category</th>
@@ -99,23 +172,21 @@
                             </tfoot>
                         </table>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card --> 
-            </div>
-            <!-- /.col -->
-        </div>
-        <!--end::Row-->
-    </div>
-    <!--end::Container-->
-</div>
-<!--end::App Content-->
+                <!-- /Products Table -->
+
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+
+    </div> <!-- /.container-fluid -->
+</div> <!-- /.app-content -->
 
 @section Scripts{
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>    
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="~/js/productIndex.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="~/js/productIndex.js"></script>   
 }
 
 

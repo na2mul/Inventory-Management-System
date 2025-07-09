@@ -21,5 +21,6 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
         {
             return await GetAsync(null, x => x.OrderBy(y => y.Name), null, true);
         }
+        
     }
 }

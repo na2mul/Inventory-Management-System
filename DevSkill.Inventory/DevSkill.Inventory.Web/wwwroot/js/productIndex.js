@@ -10,17 +10,21 @@
             [10, 25, 50, -1],
             [10, 25, 50, "All"]
         ],
-        ajax: {
+        ajax: { 
             url: "/Admin/Products/GetProductJsonData",
             type: "POST",
             contentType: "application/json", //must be added
             dataType: "json", //better to add, not mandatory
             data: function (d) {
                 d.SearchItem = {
-                    Name: $("#SearchItem_Name").val(),
-                    Description: $("#SearchItem_Description").val(),
-                    PriceFrom: $("#SearchItem_PriceFrom").val() === "" ? null : $("#SearchItem_PriceFrom").val(),
-                    PriceTo: $("#SearchItem_PriceTo").val() === "" ? null : $("#SearchItem_PriceTo").val()
+                    Name: $("#SearchItem_Name").val(),    
+                    CategoryName: $("#SearchItem_CategoryName").val(),   
+                    MeasurementUnitName: $("#SearchItem_MeasurementUnitName").val(),
+                    Barcode: $("#SearchItem_Barcode").val(),
+                    PurchasePriceFrom: $("#SearchItem_PurchasePriceFrom").val() === "" ? null : $("#SearchItem_PurchasePriceFrom").val(),
+                    PurchasePriceTo: $("#SearchItem_PurchasePriceTo").val() === "" ? null : $("#SearchItem_PurchasePriceTo").val(),
+                    StockFrom: $("#SearchItem_StockFrom").val() === "" ? null : $("#SearchItem_StockFrom").val(),
+                    StockTo: $("#SearchItem_StockTo").val() === "" ? null : $("#SearchItem_StockTo").val()
                 };
                 return JSON.stringify(d);
             },
@@ -268,9 +272,64 @@
             input.value = '';
         }
     });
+  
+    $('#SearchItem_PurchasePriceFrom').on('keyup', debounce(function () {
+        console.log("Price from:" + $('#SearchItem_PurchasePriceFrom').val());
+        $("#products").DataTable().ajax.reload(null, false);
+    }, 500));
+
+    $('#SearchItem_PurchasePriceTo').on('keyup', debounce(function () {
+        console.log("Price to:" + $('#SearchItem_PurchasePriceTo').val());
+        $("#products").DataTable().ajax.reload(null, false);
+    }, 500));
+
+    
+    $('#SearchItem_CategoryName, #SearchItem_MeasurementUnitName, #SearchItem_Name,'+
+        '#SearchItem_Barcode, #SearchItem_PurchasePriceFrom, #SearchItem_PurchasePriceTo,'+
+        '#SearchItem_StockTo, #SearchItem_StockFrom').on('keyup', debounce(function () {
+        $("#products").DataTable().ajax.reload(null, false);
+    }, 500));
+
+    function debounce(func, delay) {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                func.apply(context, args);
+            }, delay);
+        };
+    };
 
     $("#searchButton").click(function () {
         $('#products').DataTable().ajax.reload(null, false);
+    });
+
+    // temp data response fadeOut
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#response-alert').fadeOut('slow');
+        }, 4000);
+    });
+
+    // clear‑filter handler
+    $(function () {
+        const productsTable = $('#products').DataTable();
+
+        $('#btnClearFilters').on('click', function () {
+
+            //  clear every search field
+            $('#SearchItem_Name, #SearchItem_CategoryName, #SearchItem_MeasurementUnitName, #SearchItem_Barcode,' +
+                '#SearchItem_PurchasePriceFrom, #SearchItem_PurchasePriceTo, #SearchItem_StockTo, #SearchItem_StockFrom')
+                .val('');
+
+            // reset any Select2 (or similar) widgets
+            $('.select2-hidden-accessible').val(null).trigger('change');
+
+            // force the table to reload with no filters            
+            productsTable.ajax.reload(null, true);
+        });
     });
 
 });

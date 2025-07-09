@@ -11,15 +11,19 @@ namespace DevSkill.Inventory.Web.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             var sql = """
-                CREATE OR ALTER PROCEDURE [dbo].[GetProducts] 
+                GO
+                CREATE OR ALTER   PROCEDURE [dbo].[GetProducts] 
                 	@PageIndex int,
                 	@PageSize int , 
                 	@OrderBy nvarchar(50),
                 	@Name nvarchar(max) = '%',
+                	@Barcode nvarchar(20) = '%',
+                	@MeasurementUnitName nvarchar(max) = '%',	
                 	@CategoryName nvarchar(max) = '%',
-                	@Description nvarchar(max) = '%',
-                	@PriceFrom int = NULL,
-                	@PriceTo int = NULL,
+                	@PurchasePriceFrom int = NULL,
+                	@PurchasePriceTo int = NULL,
+                	@StockFrom int = NULL,
+                	@StockTo int = NULL,
                 	@Total int output,
                 	@TotalDisplay int output
                 AS
@@ -27,76 +31,124 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                 	SET NOCOUNT ON;
 
-                	Declare @sql nvarchar(2000);
-                	Declare @countsql nvarchar(2000);
-                	Declare @paramList nvarchar(MAX); 
+                	Declare @countsql nvarchar(2000);	 
                 	Declare @countparamList nvarchar(MAX);
 
                 	-- Collecting Total
                 	Select @Total = count(*) from Products;
 
                 	-- Collecting Total Display
-                	SET @countsql = 'select @TotalDisplay = count(*) from Products p inner join Category c on p.CategoryId = c.Id where 1 = 1 ';
+                	SET @countsql = 'select @TotalDisplay = COUNT(*) FROM( SELECT DISTINCT P.Id
+                						FROM Products P
+                						INNER JOIN MeasurementUnit MU ON P.MeasurementUnitId = MU.Id
+                						LEFT JOIN Category C ON P.CategoryId = C.Id
+                						WHERE 1 = 1 ';
 
-                	SET @countsql = @countsql + ' AND p.Name LIKE ''%'' + @xName + ''%''' 
-                	SET @countsql = @countsql + ' AND c.CategoryName LIKE ''%'' + @xCategoryName + ''%''' 
+                	SET @countsql = @countsql + ' AND P.Name LIKE ''%'' + @xName + ''%''' 	
+                	SET @CountSql = @CountSql + ' AND P.Barcode LIKE ''%'' + @xBarcode + ''%'''
+                	SET @CountSql = @CountSql + ' AND C.CategoryName LIKE ''%'' + @xCategoryName + ''%'''
+                	SET @CountSql = @CountSql + ' AND MU.Name LIKE ''%'' + @xMeasurementUnitName + ''%'''
 
-                	SET @countsql = @countsql + ' AND p.Description LIKE ''%'' + @xDescription + ''%''' 
+                	IF @PurchasePriceFrom IS NOT NULL
+                	SET @countsql = @countsql + ' AND P.PurchasePrice >= @xPurchasePriceFrom'
 
-                	IF @PriceFrom IS NOT NULL
-                	SET @countsql = @countsql + ' AND p.Price >= @xPriceFrom'
+                	IF @PurchasePriceTo IS NOT NULL
+                	SET @countsql = @countsql + ' AND P.PurchasePrice <= @xPurchasePriceTo' 
 
-                	IF @PriceTo IS NOT NULL
-                	SET @countsql = @countsql + ' AND p.Price <= @xPriceTo' 
+                	IF @StockFrom IS NOT NULL
+                	SET @countsql = @countsql + ' AND P.Stock >= @xStockFrom'
 
-                	SELECT @countparamlist = '@xName nvarchar(max),
+                	IF @StockTo IS NOT NULL
+                	SET @countsql = @countsql + ' AND P.Stock <= @xStockTo' 
+
+                	SET @countSql = @countSql + ') AS FilteredItems ';
+
+                	SELECT @countparamlist = '
+                		@xName nvarchar(max),
+                		@xBarcode nvarchar(20),
                 		@xCategoryName nvarchar(max),
-                		@xDescription nvarchar(max),
-                		@xPriceFrom int,
-                		@xPriceTo int,
+                		@xMeasurementUnitName nvarchar(max),
+                		@xPurchasePriceFrom int,
+                		@xPurchasePriceTo int,
+                		@xStockFrom int,
+                		@xStockTo int,
                 		@TotalDisplay int output' ;
 
                 	exec sp_executesql @countsql , @countparamlist ,
                 		@Name,
+                		@Barcode,
                 		@CategoryName,
-                		@Description,
-                		@PriceFrom,
-                		@PriceTo,
+                		@MeasurementUnitName,
+                		@PurchasePriceFrom,
+                		@PurchasePriceTo,
+                		@StockFrom,
+                		@StockTo,				
                 		@TotalDisplay = @TotalDisplay output;
 
                 	-- Collecting Data
-                	SET @sql = 'select p.Id, p.ImageUrl, p.Barcode, p.Name, c.CategoryName,
-                				p.PurchasePrice, p.MRP, p.WholesalePrice, p.Stock, p.LowStock, p.DamageStock
-                				from Products p inner join Category c on p.CategoryId = c.Id where 1 = 1 ';
+                	Declare @sql nvarchar(2000);
+                	Declare @paramList nvarchar(MAX);
 
-                	SET @sql = @sql + ' AND p.Name LIKE ''%'' + @xName + ''%'''
-                	SET @sql = @sql + ' AND c.CategoryName LIKE ''%'' + @xCategoryName + ''%''' 
+                	SET @sql = 'select
+                					P.Id,
+                					P.ImageUrl,
+                					P.Barcode,
+                					P.Name,
+                					C.CategoryName,
+                					MU.Name as MeasurementUnitName,
+                					P.PurchasePrice,
+                					P.Stock,
+                					P.DamageStock,
+                					P.LowStock,
+                					P.WholesalePrice,
+                					P.MRP
 
-                	SET @sql = @sql + ' AND p.Description LIKE ''%'' + @xDescription + ''%''' 
+                					FROM Products P
+                					INNER JOIN MeasurementUnit MU ON P.MeasurementUnitId = MU.Id
+                					LEFT JOIN Category C ON P.CategoryId = C.Id
+                					WHERE 1 = 1 ';
 
-                	IF @PriceFrom IS NOT NULL
-                	SET @sql = @sql + ' AND p.Price >= @xPriceFrom'
+                	SET @sql = @sql + ' AND P.Name LIKE ''%'' + @xName + ''%''' 
+                	SET @sql = @sql + ' AND C.CategoryName LIKE ''%'' + @xCategoryName + ''%'''
+                	SET @sql = @sql + ' AND MU.Name LIKE ''%'' + @xMeasurementUnitName + ''%''' 	
+                	SET @Sql = @Sql + ' AND P.Barcode LIKE ''%'' + @xBarcode + ''%''';
 
-                	IF @PriceTo IS NOT NULL
-                	SET @sql = @sql + ' AND p.Price <= @xPriceTo' 
+                	IF @PurchasePriceFrom IS NOT NULL
+                	SET @sql = @sql + ' AND P.PurchasePrice >= @xPurchasePriceFrom'
+
+                	IF @PurchasePriceTo IS NOT NULL
+                	SET @sql = @sql + ' AND P.PurchasePrice <= @xPurchasePriceTo'
+
+                	IF @StockFrom IS NOT NULL
+                	SET @sql = @sql + ' AND P.Stock >= @xStockFrom'
+
+                	IF @StockTo IS NOT NULL
+                	SET @sql = @sql + ' AND P.Stock <= @xStockTo'
 
                 	SET @sql = @sql + ' Order by '+@OrderBy+' OFFSET @PageSize * (@PageIndex - 1) 
                 	ROWS FETCH NEXT @PageSize ROWS ONLY';
 
-                	SELECT @paramlist = '@xName nvarchar(max),
+                	SELECT @paramlist = '
+                		@xName nvarchar(max),
+                		@xBarcode nvarchar(20),
                 		@xCategoryName nvarchar(max),
-                		@xDescription nvarchar(max),
-                		@xPriceFrom int,
-                		@xPriceTo int,
+                		@xMeasurementUnitName nvarchar(max),
+                		@xPurchasePriceFrom int,
+                		@xPurchasePriceTo int,
+                		@xStockFrom int,
+                		@xStockTo int,
                 		@PageIndex int,
-                		@PageSize int' ;
+                		@PageSize int';
 
                 	exec sp_executesql @sql , @paramlist ,
                 		@Name,
+                		@Barcode,
                 		@CategoryName,
-                		@Description,
-                		@PriceFrom,
-                		@PriceTo,
+                		@MeasurementUnitName,
+                		@PurchasePriceFrom,
+                		@PurchasePriceTo,
+                		@StockFrom,
+                		@StockTo,
                 		@PageIndex,
                 		@PageSize;
 

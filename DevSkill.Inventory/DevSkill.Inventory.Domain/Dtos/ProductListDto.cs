@@ -13,12 +13,12 @@ namespace DevSkill.Inventory.Domain.Dtos
         public string? Name { get; set; }
         public string? Barcode { get; set; }
         public string? CategoryName { get; set; }
+        public string? MeasurementUnitName { get; set; }
         public int? PurchasePrice { get; set; }
         public int? MRP { get; set; }
         public int? WholesalePrice { get; set; }
         public int? Stock { get; set; }
         public int? LowStock { get; set; }
         public int? DamageStock { get; set; }
-        public int? MeasurementUnit { get; set; }
-    }
+    }       
 }

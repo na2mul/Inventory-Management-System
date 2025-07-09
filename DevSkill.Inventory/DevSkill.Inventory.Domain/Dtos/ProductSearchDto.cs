@@ -8,9 +8,13 @@ namespace DevSkill.Inventory.Domain.Dtos
 {
     public class ProductSearchDto
     {
-        public string Name { get; set; }
-        public double? PriceTo { get; set; }
-        public double? PriceFrom { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public int? PurchasePriceFrom { get; set; }
+        public int? PurchasePriceTo { get; set; }
+        public int? StockFrom { get; set; }
+        public int? StockTo { get; set; }
+        public string? Barcode { get; set; }
+        public string? CategoryName { get; set; }
+        public string? MeasurementUnitName { get; set; }
     }
 }

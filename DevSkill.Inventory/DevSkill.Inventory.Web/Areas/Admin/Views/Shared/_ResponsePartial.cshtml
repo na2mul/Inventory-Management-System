@@ -3,7 +3,7 @@
 @if (TempData.Peek<ResponseModel>("ResponseMessage") != null)
 {
     var response = TempData.Get<ResponseModel>("ResponseMessage");
-    <div class="callout callout-@(response.Type.ToString().ToLower())">
+    <div id ="response-alert" class="alert alert-@(response.Type.ToString().ToLower())">
         @response.Message
     </div>
 }

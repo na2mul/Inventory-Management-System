@@ -12,6 +12,7 @@ using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Application.Features.Categories.Queries;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
 using DevSkill.Inventory.Infrastructure.Utilities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -21,24 +22,21 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly ILogger<ProductsController> _logger;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IImageUtility _imageUtility;
 
         public ProductsController(
             ILogger<ProductsController> logger,
             IMapper mapper,
             IMediator mediator,
-            IWebHostEnvironment webHostEnvironment,
             IImageUtility imageUtility)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
-            _webHostEnvironment = webHostEnvironment;
             _imageUtility = imageUtility;
         }
-        public IActionResult Index()
-        {
+        public async Task<IActionResult> Index()
+        {            
             return View();
         }             
        
@@ -82,7 +80,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
-
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAsync(UpdateProductModel model)
@@ -212,12 +209,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public  async Task<JsonResult> GetProductJsonDataAsync([FromBody] ProductListModel model)
+        public  async Task<JsonResult> GetProductJsonDataAsync([FromBody] ProductGetListQuery model)
         {
             try
-            {
-                var productQuery = _mapper.Map<ProductGetListQuery>(model);
-                var (data, total, totalDisplay) = await _mediator.Send(productQuery);
+            {                
+                var (data, total, totalDisplay) = await _mediator.Send(model);
                 var products = new
                 {
                     recordsTotal = total,
@@ -301,7 +297,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(new { success = false, message = error });
             }
         }
-
         public async Task<IActionResult> GetMeasurementUnitsAsync()
         {
             try
@@ -316,7 +311,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(new { success = false, message = error });
             }
         }
-
         public async Task<IActionResult> GetProductsAsync()
         {
             try
@@ -331,7 +325,5 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(new { success = false, message = error });
             }
         }
-
-
     }
 }      
