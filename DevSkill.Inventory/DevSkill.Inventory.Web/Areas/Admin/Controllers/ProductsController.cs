@@ -13,8 +13,8 @@ using DevSkill.Inventory.Application.Features.Categories.Queries;
 using DevSkill.Inventory.Application.Features.Categories.Commands;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
 using DevSkill.Inventory.Infrastructure.Utilities;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using DevSkill.Inventory.Domain.Entities;
+using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -49,8 +49,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    Guid categoryId;
-                    if(!Guid.TryParse(model.CategoryId, out categoryId))
+                    if (!Guid.TryParse(model.CategoryId, out Guid categoryId))
                     {
                         var categoryModel = new Category() { CategoryName = model.CategoryId.Trim() };
                         var category = _mapper.Map<CategoryAddCommand>(categoryModel);
@@ -59,8 +58,21 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                         await _mediator.Send(category);
                         categoryId = category.Id;
                     }
+
+                    if (!Guid.TryParse(model.MeasurementUnitId, out Guid measurementUnitId))
+                    {
+                        var measurementUnitModel = new MeasurementUnit() { Name = model.MeasurementUnitId.Trim() };
+                        var measurementUnit = _mapper.Map<MeasurementUnitAddCommand>(measurementUnitModel);
+                        measurementUnit.Id = IdentityGenerator.NewSequentialGuid();
+
+                        await _mediator.Send(measurementUnit);
+                        measurementUnitId = measurementUnit.Id;
+                    }
+
                     model.CategoryId = categoryId.ToString();
-                    var product = _mapper.Map<ProductAddCommand>(model);                    
+                    model.MeasurementUnitId = measurementUnitId.ToString();
+                    var product = _mapper.Map<ProductAddCommand>(model);
+                    
                     product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     product.Id = IdentityGenerator.NewSequentialGuid();
                     await _mediator.Send(product);

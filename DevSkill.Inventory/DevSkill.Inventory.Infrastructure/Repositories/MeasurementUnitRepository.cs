@@ -21,6 +21,13 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
         {
             return await GetAsync(null, x => x.OrderBy(y => y.Name), null, true);
         }
-        
+        public bool IsNameDuplicate(string name, Guid? id = null)
+        {
+            if (id.HasValue)
+                return GetCount(x => x.Id != id.Value && x.Name == name) > 0;
+            else
+                return GetCount(x => x.Name == name) > 0;
+        }
+
     }
 }
