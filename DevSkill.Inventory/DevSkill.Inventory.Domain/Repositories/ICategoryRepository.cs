@@ -10,5 +10,6 @@ namespace DevSkill.Inventory.Domain.Repositories
     public interface ICategoryRepository : IRepository<Category,Guid>
     {
         public Task<IList<Category>> GetOrderedCategoriesAsync();
+        public bool IsNameDuplicate(string name, Guid? id = null);
     }
 }

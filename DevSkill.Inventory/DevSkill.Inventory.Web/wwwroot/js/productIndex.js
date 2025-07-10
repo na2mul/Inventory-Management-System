@@ -121,7 +121,7 @@
             });
     }
 
-    // Get Products for both Modals
+    // Searching Products for both Modals
     $('#damageProductModal, #storeProductModal').on('shown.bs.modal', function () {
         const $modal = $(this);            
         const $select = $modal.find('.product-select');
@@ -129,7 +129,7 @@
         if (!$select.hasClass('select2-hidden-accessible')) {
             loadProducts($select).then(() => {
                 $select.select2({
-                    allowClear: true,
+                    allowClear: false,
                     width: '100%',
                     dropdownParent: $modal 
                 });
@@ -181,6 +181,25 @@
                 alert('Failed to load measurement units.');
             });
     }
+
+    // Searching Categories, Units for both Modals
+    //function initSelect($modal, selector, loader) {
+    //    const $sel = $modal.find(selector).not('.select2-hidden-accessible');
+    //    if ($sel.length) {
+    //        loader($sel).then(() =>
+    //            $sel.select2({
+    //                allowClear: false,
+    //                width: '100%',
+    //                dropdownParent: $modal
+    //            })
+    //        );
+    //    }
+    //}
+    //$('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
+    //    const $m = $(this);
+    //    initSelect($m, '.category-select', loadCategories);
+    //    initSelect($m, '.measurementUnit-select', loadMeasurementUnits);
+    //});
 
     //update
     function Update(id) {
@@ -236,9 +255,9 @@
         $('#addProductForm').submit();
     });
 
-    $('#update-button').click(function () {
+    $('#update-button').click(function () {  
         $('#updateProductForm').submit();
-    });
+    });    
 
     // Image Validation 
     document.addEventListener('change', function (e) {
@@ -331,5 +350,49 @@
             productsTable.ajax.reload(null, true);
         });
     });
+    // for category
+    $(function () {
+        $('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
+            const $modal = $(this);
+            const $sel = $modal.find('.category-select').not('.select2-hidden-accessible');
+            if (!$sel.length) return;
 
+            loadCategories($sel).then(() => {
+                $sel.select2({
+                    tags: true,                       // accepts new terms
+                    allowClear: false,
+                    width: '100%',
+                    dropdownParent: $modal,
+                    placeholder: 'Select or type a category',
+                    createTag: params => {
+                        const term = $.trim(params.term);
+                        return term ? { id: term, text: term, newTag: true } : null;
+                    }
+                });
+            });
+        });
+    });
+    //for unit
+    $(function () {
+        $('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
+            const $modal = $(this);
+            const $sel = $modal.find('.measurementUnit-select').not('.select2-hidden-accessible');
+            if (!$sel.length) return;
+
+            loadMeasurementUnits($sel).then(() => {
+                $sel.select2({
+                    tags: true,
+                    allowClear: false,
+                    width: '100%',
+                    dropdownParent: $modal,
+                    placeholder: 'Select or type a unit',
+                    createTag: params => {
+                        const term = $.trim(params.term);
+                        return term ? { id: term, text: term, newTag: true } : null;
+                    }
+                });
+            });
+        });
+    });
+   
 });

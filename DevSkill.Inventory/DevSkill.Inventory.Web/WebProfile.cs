@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DevSkill.Inventory.Application.Features.Categories.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Domain.Dtos;
@@ -22,6 +23,9 @@ namespace DevSkill.Inventory.Web
             CreateMap<ProductStoreCommand, StoreProductModel>().ReverseMap();
             CreateMap<ProductDamageCommand, Product>().ReverseMap();
             CreateMap<ProductDamageCommand, DamageProductModel>().ReverseMap();
+            CreateMap<CategoryAddCommand, Category>().ReverseMap();
+
+
 
 
 

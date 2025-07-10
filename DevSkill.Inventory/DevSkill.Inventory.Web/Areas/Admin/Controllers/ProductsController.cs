@@ -10,9 +10,11 @@ using MediatR;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Application.Features.Categories.Queries;
+using DevSkill.Inventory.Application.Features.Categories.Commands;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
 using DevSkill.Inventory.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DevSkill.Inventory.Domain.Entities;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -47,7 +49,18 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    var product = _mapper.Map<ProductAddCommand>(model);
+                    Guid categoryId;
+                    if(!Guid.TryParse(model.CategoryId, out categoryId))
+                    {
+                        var categoryModel = new Category() { CategoryName = model.CategoryId.Trim() };
+                        var category = _mapper.Map<CategoryAddCommand>(categoryModel);
+                        category.Id = IdentityGenerator.NewSequentialGuid();
+
+                        await _mediator.Send(category);
+                        categoryId = category.Id;
+                    }
+                    model.CategoryId = categoryId.ToString();
+                    var product = _mapper.Map<ProductAddCommand>(model);                    
                     product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     product.Id = IdentityGenerator.NewSequentialGuid();
                     await _mediator.Send(product);
