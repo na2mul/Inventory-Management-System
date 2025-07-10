@@ -180,28 +180,9 @@
             .fail(function () {
                 alert('Failed to load measurement units.');
             });
-    }
+    }    
 
-    // Searching Categories, Units for both Modals
-    //function initSelect($modal, selector, loader) {
-    //    const $sel = $modal.find(selector).not('.select2-hidden-accessible');
-    //    if ($sel.length) {
-    //        loader($sel).then(() =>
-    //            $sel.select2({
-    //                allowClear: false,
-    //                width: '100%',
-    //                dropdownParent: $modal
-    //            })
-    //        );
-    //    }
-    //}
-    //$('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
-    //    const $m = $(this);
-    //    initSelect($m, '.category-select', loadCategories);
-    //    initSelect($m, '.measurementUnit-select', loadMeasurementUnits);
-    //});
-
-    //update
+    //for update modal
     function Update(id) {
         const $modal = $('#updateProductModal');
         const $catSelect = $modal.find('.category-select');
@@ -210,9 +191,7 @@
         $.ajax({
             url: '/Admin/Products/GetProductForUpdate',
             type: 'GET',
-            data: {
-                id
-            },
+            data: { id },
             dataType: 'json'
         })
             .done(function (resp) {
@@ -234,6 +213,34 @@
                     loadCategories($catSelect, p.categoryId),
                     loadMeasurementUnits($muSelect, p.measurementUnitId)
                 ).then(function () {
+                    // Destroy existing instances if needed
+                    if ($catSelect.hasClass('select2-hidden-accessible')) $catSelect.select2('destroy');
+                    if ($muSelect.hasClass('select2-hidden-accessible')) $muSelect.select2('destroy');
+
+                    $catSelect.select2({
+                        tags: true,
+                        allowClear: false,
+                        width: '100%',
+                        dropdownParent: $modal,
+                        placeholder: 'Select or type a category',
+                        createTag: params => {
+                            const term = $.trim(params.term);
+                            return term ? { id: term, text: term, newTag: true } : null;
+                        }
+                    });
+
+                    $muSelect.select2({
+                        tags: true,
+                        allowClear: false,
+                        width: '100%',
+                        dropdownParent: $modal,
+                        placeholder: 'Select or type a unit',
+                        createTag: params => {
+                            const term = $.trim(params.term);
+                            return term ? { id: term, text: term, newTag: true } : null;
+                        }
+                    });
+
                     $modal.modal('show');
                 });
             })
@@ -241,6 +248,7 @@
                 alert('Could not load product for editing.');
             });
     }
+
 
     // Add Product modal 
     $('#AddProductModal').on('show.bs.modal', function () {
@@ -350,16 +358,17 @@
             productsTable.ajax.reload(null, true);
         });
     });
-    // for category
+
+    // for category searching and selecting new category
     $(function () {
-        $('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
+        $('#AddProductModal').on('shown.bs.modal', function () {
             const $modal = $(this);
             const $sel = $modal.find('.category-select').not('.select2-hidden-accessible');
             if (!$sel.length) return;
 
             loadCategories($sel).then(() => {
                 $sel.select2({
-                    tags: true,                       // accepts new terms
+                    tags: true,                     
                     allowClear: false,
                     width: '100%',
                     dropdownParent: $modal,
@@ -372,9 +381,9 @@
             });
         });
     });
-    //for unit
+    //for unit searching and selecting new unit
     $(function () {
-        $('#updateProductModal, #AddProductModal').on('shown.bs.modal', function () {
+        $('#AddProductModal').on('shown.bs.modal', function () {
             const $modal = $(this);
             const $sel = $modal.find('.measurementUnit-select').not('.select2-hidden-accessible');
             if (!$sel.length) return;

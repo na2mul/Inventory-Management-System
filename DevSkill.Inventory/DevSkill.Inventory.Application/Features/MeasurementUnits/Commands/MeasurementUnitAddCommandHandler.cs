@@ -31,7 +31,7 @@ namespace DevSkill.Inventory.Application.Features.MeasurementUnits.Commands
                 await _applicationUnitOfWork.SaveAsync();
             }
             else
-                throw new DuplicateProductNameException();
+                throw new DuplicateNameException("MeasurementUnit");
         }
     }
 }

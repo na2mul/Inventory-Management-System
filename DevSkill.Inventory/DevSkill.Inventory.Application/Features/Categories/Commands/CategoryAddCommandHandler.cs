@@ -31,7 +31,7 @@ namespace DevSkill.Inventory.Application.Features.Categories.Commands
                 await _applicationUnitOfWork.SaveAsync();
             }
             else
-                throw new DuplicateProductNameException();
+                throw new DuplicateNameException("Category");
         }
     }
 }

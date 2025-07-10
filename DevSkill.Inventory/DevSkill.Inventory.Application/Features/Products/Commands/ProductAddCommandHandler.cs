@@ -25,7 +25,7 @@ namespace DevSkill.Inventory.Application.Features.Products.Commands
                 await _applicationUnitOfWork.SaveAsync();
             }
             else
-                throw new DuplicateProductNameException();
+                throw new DuplicateNameException("Product");
         }
     }
 }

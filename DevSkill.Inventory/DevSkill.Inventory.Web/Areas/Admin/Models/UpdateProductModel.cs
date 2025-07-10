@@ -11,7 +11,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Models
         public string? Barcode { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public Guid? CategoryId { get; set; }
+        public string? CategoryId { get; set; }
         public IList<SelectListItem>? Categories { get; set; }
         public int? PurchasePrice { get; set; }
         public int? MRP { get; set; }
@@ -19,7 +19,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Models
         public int? Stock { get; set; }
         public int? LowStock { get; set; }
         public int? DamageStock { get; set; }
-        public Guid? MeasurementUnitId { get; set; }
+        public string? MeasurementUnitId { get; set; }
         public IList<SelectListItem>? MeasurementUnit { get; set; }
     }
 }

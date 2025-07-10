@@ -18,7 +18,6 @@ namespace DevSkill.Inventory.Application.Features.Products.Queries
         public async Task<(IList<ProductListDto>, int, int)> Handle(ProductGetListQuery request,
             CancellationToken cancellationToken)
         {
-            //var search = _mapper.Map<ProductSearchDto>(request.SearchItem);
             var procedureName = "GetProducts";
 
             var result = await _applicationUnitOfWork.SqlUtility.QueryWithStoredProcedureAsync<ProductListDto>(procedureName,                

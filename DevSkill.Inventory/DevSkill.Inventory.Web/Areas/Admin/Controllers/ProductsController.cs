@@ -49,25 +49,8 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    if (!Guid.TryParse(model.CategoryId, out Guid categoryId))
-                    {
-                        var categoryModel = new Category() { CategoryName = model.CategoryId.Trim() };
-                        var category = _mapper.Map<CategoryAddCommand>(categoryModel);
-                        category.Id = IdentityGenerator.NewSequentialGuid();
-
-                        await _mediator.Send(category);
-                        categoryId = category.Id;
-                    }
-
-                    if (!Guid.TryParse(model.MeasurementUnitId, out Guid measurementUnitId))
-                    {
-                        var measurementUnitModel = new MeasurementUnit() { Name = model.MeasurementUnitId.Trim() };
-                        var measurementUnit = _mapper.Map<MeasurementUnitAddCommand>(measurementUnitModel);
-                        measurementUnit.Id = IdentityGenerator.NewSequentialGuid();
-
-                        await _mediator.Send(measurementUnit);
-                        measurementUnitId = measurementUnit.Id;
-                    }
+                    var categoryId = await _mediator.Send(new EnsureCategoryExistsCommand(model.CategoryId));
+                    var measurementUnitId = await _mediator.Send(new EnsureMeasurementUnitExistsCommand(model.MeasurementUnitId));
 
                     model.CategoryId = categoryId.ToString();
                     model.MeasurementUnitId = measurementUnitId.ToString();
@@ -83,7 +66,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                         Type = ResponseTypes.Success
                     });
                 }
-                catch (DuplicateProductNameException de)
+                catch (Application.Exceptions.DuplicateNameException de)
                 {
                     ModelState.AddModelError("DuplicateProduct", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()
@@ -113,7 +96,13 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             {
                 try
                 {
+                    var categoryId = await _mediator.Send(new EnsureCategoryExistsCommand(model.CategoryId));
+                    var measurementUnitId = await _mediator.Send(new EnsureMeasurementUnitExistsCommand(model.MeasurementUnitId));
+
+                    model.CategoryId = categoryId.ToString();
+                    model.MeasurementUnitId = measurementUnitId.ToString();
                     var product = _mapper.Map<ProductUpdateCommand>(model);
+
                     product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     await _mediator.Send(product);
                     TempData.Put("ResponseMessage", new ResponseModel()
@@ -124,7 +113,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     });
                     return RedirectToAction("Index");
                 }
-                catch (DuplicateProductNameException de)
+                catch (Application.Exceptions.DuplicateNameException de)
                 {
                     ModelState.AddModelError("DuplicateProduct", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()
