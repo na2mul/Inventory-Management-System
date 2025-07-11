@@ -31,7 +31,9 @@ namespace DevSkill.Inventory.Web
             CreateMap<MeasurementUnitAddCommand, MeasurementUnit>().ReverseMap();
             CreateMap<CustomerAddCommand, Customer>().ReverseMap();
             CreateMap<CustomerAddCommand, AddCustomerModel>().ReverseMap();
-
+            CreateMap<CustomerUpdateCommand, Customer>().ReverseMap();
+            CreateMap<CustomerUpdateCommand, UpdateCustomerModel>().ReverseMap();
+            CreateMap<UpdateCustomerModel, Customer>().ReverseMap();
         }
     }
 }

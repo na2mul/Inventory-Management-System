@@ -83,19 +83,11 @@
         $('#delete-id').val(id);
         $('#delete-form').attr('action', '/admin/customers/delete');
         deleteModal.modal('show');
-    });
+    });    
 
     $('#delete-button').click(function () {
         $('#delete-form').submit();
-    });
-
-    $('#add-button').click(function () {
-        $('#addCustomerForm').submit();
-    });
-
-    $('#update-button').click(function () {
-        $('#updateCustomerForm').submit();
-    });    
+    });        
 
     //automatic searching for advance search
     $('#SearchItem_Name, #SearchItem_CustomerId, #SearchItem_Address,' +
@@ -115,6 +107,49 @@
         };
     };
 
+    //for update modal
+    function Update(id) {
+        const $modal = $('#updateCustomerModal');        
+
+        $.ajax({
+            url: '/Admin/Customers/GetCustomerForUpdate',
+            type: 'GET',
+            data: { id },
+            dataType: 'json'
+        })
+            .done(function (resp) {
+                const c = resp.data || resp;
+
+                $modal.find('#Id').val(c.id);
+                $modal.find('#Name').val(c.name);
+                $modal.find('#CustomerId').val(c.customerId);
+                $modal.find('#Mobile').val(c.mobile);
+                $modal.find('#Address').val(c.address);
+                $modal.find('#Email').val(c.email);
+                $modal.find('#Balance').val(c.balance);
+                $modal.find('#Status').val(c.status ? "true" : "false");                
+                $modal.find('#ImageUrl').val(c.imageUrl);      
+                $modal.modal('show');
+            })
+
+            .fail(function () {
+                alert('Could not load customer for editing.');
+            });
+    }
+    //showing update modal
+    $(document).on('click', '.showUpdateModal', function () {
+        const id = $(this).data('id');
+        Update(id);
+    });
+
+    $('#add-button').click(function () {
+        $('#addCustomerForm').submit();
+    });
+
+    $('#update-button').click(function () {
+        $('#updateCustomerForm').submit();
+    });
+
     // clear‑filter handler
     $(function () {
         const productsTable = $('#customers').DataTable();
@@ -132,5 +167,12 @@
             // force the table to reload with no filters            
             productsTable.ajax.reload(null, true);
         });
+    });
+
+    // temp data response fadeOut
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#response-alert').fadeOut('slow');
+        }, 4000);
     });
 });

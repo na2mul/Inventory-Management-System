@@ -1,17 +1,9 @@
-﻿using DevSkill.Inventory.Domain.Features.Customers.Commands;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DevSkill.Inventory.Application.Features.Customers.Commands
+﻿namespace DevSkill.Inventory.Web.Areas.Admin.Models.Customers
 {
-    public class CustomerAddCommand : IRequest, ICustomerAddCommand
+    public class UpdateCustomerModel
     {
         public Guid Id { get; set; }
+        public IFormFile? Image { get; set; }
         public string? ImageUrl { get; set; }
         public string? Name { get; set; }
         public string? CustomerId { get; set; }

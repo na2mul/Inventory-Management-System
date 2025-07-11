@@ -1,6 +1,5 @@
 ﻿using DevSkill.Inventory.Domain.Features.Customers.Commands;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DevSkill.Inventory.Application.Features.Customers.Commands
 {
-    public class CustomerAddCommand : IRequest, ICustomerAddCommand
+    public class CustomerUpdateCommand : IRequest, ICustomerUpdateCommand
     {
         public Guid Id { get; set; }
         public string? ImageUrl { get; set; }

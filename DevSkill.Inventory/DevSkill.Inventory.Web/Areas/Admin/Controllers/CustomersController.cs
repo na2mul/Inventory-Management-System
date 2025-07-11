@@ -1,8 +1,4 @@
 ﻿using AutoMapper;
-using DevSkill.Inventory.Application.Features.Categories.Queries;
-using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
-using DevSkill.Inventory.Application.Features.Products.Commands;
-using DevSkill.Inventory.Application.Features.Products.Queries;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Infrastructure.Utilities;
 using DevSkill.Inventory.Infrastructure;
@@ -11,7 +7,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
 using DevSkill.Inventory.Application.Features.Customers.Queries;
-using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using DevSkill.Inventory.Application.Features.Customers.Commands;
 
@@ -82,7 +77,52 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
-                
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateAsync(UpdateCustomerModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {                   
+                    var customer = _mapper.Map<CustomerUpdateCommand>(model);
+
+                    customer.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
+                    await _mediator.Send(customer);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "customer Updated",
+                        Type = ResponseTypes.Success
+
+                    });
+                    return RedirectToAction("Index");
+                }
+                catch (Application.Exceptions.DuplicateNameException de)
+                {
+                    ModelState.AddModelError("DuplicateCustomer", de.Message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Danger
+
+                    });
+                }
+                catch (Exception ex)
+                {
+                    string message = "Failed to update customer";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
+                        Type = ResponseTypes.Danger
+
+                    });
+                }
+            }
+            return View(model);
+        }
+
+
         [HttpPost]
         public async Task<JsonResult> GetCustomerJsonDataAsync([FromBody] CustomerGetListQuery model)
         {
@@ -115,6 +155,43 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 _logger.LogError(ex, "there was a problem getting customers");
                 return Json(DataTables.EmptyResult);
             }
-        }        
+        }
+
+        public async Task<JsonResult> GetCustomerForUpdateAsync(Guid id)
+        {
+            try
+            {
+                var customer = await _mediator.Send(new CustomerGetQuery() { Id = id });
+
+                if (customer == null)
+                {
+                    return Json(new { success = false, message = "Customer not found" });
+                }
+                var model = _mapper.Map<UpdateCustomerModel>(customer);
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = model.Id,
+                        name = model.Name,
+                        customerId = model.CustomerId,
+                        address = model.Address,
+                        balance = model.Balance,
+                        email = model.Email,
+                        status = model.Status,
+                        mobile = model.Mobile,
+                        imageUrl = model.ImageUrl
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting customers";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
     }
 }
