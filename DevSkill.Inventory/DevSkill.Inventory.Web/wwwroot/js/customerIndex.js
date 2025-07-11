@@ -169,6 +169,37 @@
         });
     });
 
+    // Image Validation 
+    document.addEventListener('change', function (e) {
+        const input = e.target;
+        if (!(input.matches && input.matches('input[type="file"]#Image'))) return;
+
+        // Remove any previous error message
+        const existing = input.parentNode.querySelector('.image-error');
+        if (existing) existing.remove();
+
+        const file = input.files[0];
+        if (!file) return;
+
+        const allowed = ['image/png', 'image/jpeg'];
+        const maxBytes = 512000;
+        let message = '';
+
+        if (!allowed.includes(file.type)) {
+            message = 'PNG or JPG only';
+        } else if (file.size > maxBytes) {
+            message = 'Max Size 500 KB';
+        }
+
+        if (message) {
+            const span = document.createElement('span');
+            span.textContent = message;
+            span.className = 'image-error text-danger small';
+            input.insertAdjacentElement('afterend', span); // ← show directly below input
+            input.value = ''; // Clear the invalid file
+        }
+    });
+
     // temp data response fadeOut
     $(document).ready(function () {
         setTimeout(function () {
