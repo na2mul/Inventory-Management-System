@@ -20,6 +20,7 @@ namespace DevSkill.Inventory.Infrastructure
         private readonly string _migrationAssembly;
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         public ApplicationDbContext(string connectionString, string migrationAssembly)
         {

@@ -15,6 +15,7 @@ using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
 using DevSkill.Inventory.Infrastructure.Utilities;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {

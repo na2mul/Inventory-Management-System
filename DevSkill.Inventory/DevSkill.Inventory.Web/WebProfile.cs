@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using DevSkill.Inventory.Application.Features.Categories.Commands;
+using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
-using DevSkill.Inventory.Domain.Dtos;
+using DevSkill.Inventory.Domain.Dtos.ProductDtos;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 
 namespace DevSkill.Inventory.Web
 {
@@ -26,6 +29,9 @@ namespace DevSkill.Inventory.Web
             CreateMap<ProductDamageCommand, DamageProductModel>().ReverseMap();
             CreateMap<CategoryAddCommand, Category>().ReverseMap();
             CreateMap<MeasurementUnitAddCommand, MeasurementUnit>().ReverseMap();
+            CreateMap<CustomerAddCommand, Customer>().ReverseMap();
+            CreateMap<CustomerAddCommand, AddCustomerModel>().ReverseMap();
+
         }
     }
 }

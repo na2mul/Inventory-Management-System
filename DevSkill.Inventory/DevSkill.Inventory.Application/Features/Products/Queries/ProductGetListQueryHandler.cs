@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DevSkill.Inventory.Domain;
 using MediatR;
-using DevSkill.Inventory.Domain.Dtos;
+using DevSkill.Inventory.Domain.Dtos.ProductDtos;
 
 namespace DevSkill.Inventory.Application.Features.Products.Queries
 {

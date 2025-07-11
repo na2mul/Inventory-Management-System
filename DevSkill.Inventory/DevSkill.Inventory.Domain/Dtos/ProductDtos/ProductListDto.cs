@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevSkill.Inventory.Domain.Dtos
+namespace DevSkill.Inventory.Domain.Dtos.ProductDtos
 {
     public class ProductListDto
     {

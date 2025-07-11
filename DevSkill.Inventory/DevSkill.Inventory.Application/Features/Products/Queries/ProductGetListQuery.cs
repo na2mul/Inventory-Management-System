@@ -1,5 +1,5 @@
 ﻿using DevSkill.Inventory.Domain;
-using DevSkill.Inventory.Domain.Dtos;
+using DevSkill.Inventory.Domain.Dtos.ProductDtos;
 using DevSkill.Inventory.Domain.Features.Products.Queries;
 using MediatR;
 

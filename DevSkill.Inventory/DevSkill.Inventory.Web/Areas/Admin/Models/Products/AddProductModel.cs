@@ -1,11 +1,9 @@
-﻿using DevSkill.Inventory.Domain.Entities;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DevSkill.Inventory.Web.Areas.Admin.Models
+namespace DevSkill.Inventory.Web.Areas.Admin.Models.Products
 {
-    public class UpdateProductModel
+    public class AddProductModel
     {
-        public Guid Id { get; set; }
         public IFormFile? Image { get; set; }
         public string? ImageUrl { get; set; }
         public string? Barcode { get; set; }

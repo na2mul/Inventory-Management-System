@@ -7,6 +7,6 @@ namespace DevSkill.Inventory.Domain
         public IProductRepository ProductRepository { get; }
         public ICategoryRepository CategoryRepository { get; }
         public IMeasurementUnitRepository MeasurementUnitRepository { get; }
-
+        public ICustomerRepository CustomerRepository { get; }
     }
 }

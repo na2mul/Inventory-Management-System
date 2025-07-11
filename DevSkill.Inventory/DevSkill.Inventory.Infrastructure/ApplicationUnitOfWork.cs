@@ -16,15 +16,22 @@ namespace DevSkill.Inventory.Infrastructure
         public IProductRepository ProductRepository { get; set; }
         public ICategoryRepository CategoryRepository { get; set; }
         public IMeasurementUnitRepository MeasurementUnitRepository { get; set; }
+        public ICustomerRepository CustomerRepository { get; set; }
 
         private readonly ApplicationDbContext _dbContext;
-        public ApplicationUnitOfWork(ApplicationDbContext context, IProductRepository productRepository, ICategoryRepository categoryRepository, IMeasurementUnitRepository measurementUnitRepository)
-            : base(context)
+        public ApplicationUnitOfWork(
+            ApplicationDbContext context,
+            IProductRepository productRepository,
+            ICategoryRepository categoryRepository,
+            IMeasurementUnitRepository measurementUnitRepository,
+            ICustomerRepository customerRepository
+            ) : base(context)
         {
             _dbContext = context;
             ProductRepository = productRepository;
             CategoryRepository = categoryRepository;
             MeasurementUnitRepository = measurementUnitRepository;
+            CustomerRepository = customerRepository;
         }
     }
 }
