@@ -95,5 +95,42 @@
 
     $('#update-button').click(function () {
         $('#updateCustomerForm').submit();
+    });    
+
+    //automatic searching for advance search
+    $('#SearchItem_Name, #SearchItem_CustomerId, #SearchItem_Address,' +
+        '#SearchItem_Mobile, #SearchItem_BalanceFrom, #SearchItem_BalanceTo,' +
+        '#SearchItem_Email').on('keyup', debounce(function () {
+            $("#customers").DataTable().ajax.reload(null, false);
+        }, 500));
+    function debounce(func, delay) {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                func.apply(context, args);
+            }, delay);
+        };
+    };
+
+    // clear‑filter handler
+    $(function () {
+        const productsTable = $('#customers').DataTable();
+
+        $('#btnClearFilters').on('click', function () {
+
+            //  clear every search field
+            $('#SearchItem_Name, #SearchItem_CustomerId, #SearchItem_Address, #SearchItem_Mobile,' +
+                '#SearchItem_BalanceFrom, #SearchItem_BalanceTo, #SearchItem_Email')
+                .val('');
+
+            // reset any Select2 (or similar) widgets
+            $('.select2-hidden-accessible').val(null).trigger('change');
+
+            // force the table to reload with no filters            
+            productsTable.ajax.reload(null, true);
+        });
     });
 });
