@@ -9,6 +9,7 @@ using System.Web;
 using DevSkill.Inventory.Application.Features.Customers.Queries;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using DevSkill.Inventory.Application.Features.Customers.Commands;
+using DevSkill.Inventory.Application.Features.Products.Commands;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -193,5 +194,32 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(new { success = false, message = error });
             }
         }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            try
+            {
+                await _mediator.Send(new CustomerDeleteCommand() { Id = id });
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = "Customer Deleted",
+                    Type = ResponseTypes.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                string message = "Failed to delete Customer";
+
+                _logger.LogError(ex, message);
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = message,
+                    Type = ResponseTypes.Danger
+                });
+            }
+            return RedirectToAction("Index");
+        }
+
     }
 }
