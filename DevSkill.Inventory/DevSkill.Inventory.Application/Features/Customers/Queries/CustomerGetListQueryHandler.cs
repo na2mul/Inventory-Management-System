@@ -31,7 +31,7 @@ namespace DevSkill.Inventory.Application.Features.Customers.Queries
                 new Dictionary<string, object>
                 {
                     { "PageIndex", request.PageIndex },
-                    { "PageSize", request.PageSize },
+                    { "PageSize", request.PageSize == -1 ? int.MaxValue : request.PageSize },
                     { "OrderBy", request.FormatSortExpression(["Id","ImageUrl","ID","Name","Mobile","Address", "Email", "Balance", "Status","Id"]) },
                     { "Name", string.IsNullOrEmpty(request.SearchItem.Name) ? null : request.SearchItem.Name },
                     { "BalanceFrom", request.SearchItem.BalanceFrom.HasValue ? request.SearchItem.BalanceFrom : null },

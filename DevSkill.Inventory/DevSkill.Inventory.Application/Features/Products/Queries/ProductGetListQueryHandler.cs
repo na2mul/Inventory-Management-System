@@ -24,7 +24,7 @@ namespace DevSkill.Inventory.Application.Features.Products.Queries
                 new Dictionary<string, object>
                 {
                     { "PageIndex", request.PageIndex },
-                    { "PageSize", request.PageSize },
+                    { "PageSize", request.PageSize == -1 ? int.MaxValue : request.PageSize },
                     { "OrderBy", request.FormatSortExpression(["Id","ImageUrl","Name","Barcode","CategoryName", "PurchasePrice", "MRP", "WholesalePrice", "Stock","LowStock","DamageStock","Id"]) },
                     { "Name", string.IsNullOrEmpty(request.SearchItem.Name) ? null : request.SearchItem.Name },
                     { "PurchasePriceFrom", request.SearchItem.PurchasePriceFrom.HasValue ? request.SearchItem.PurchasePriceFrom : null },

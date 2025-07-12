@@ -10,6 +10,43 @@
             [10, 25, 50, -1],
             [10, 25, 50, "All"]
         ],
+        dom: '<"row mb-2"<"col-sm-12"l>>' +
+            '<"row mb-2"<"col-sm-12"B>>' +
+            '<"row"<"col-sm-12"tr>>' +
+            '<"row mt-2"<"col-sm-6"i><"col-sm-6"p>>',
+        buttons: [
+            {
+                extend: 'copy',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'csv',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'excel',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'pdf',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+            {
+                extend: 'print',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            }
+        ],
+
         ajax: { 
             url: "/Admin/Products/GetProductJsonData",
             type: "POST",
