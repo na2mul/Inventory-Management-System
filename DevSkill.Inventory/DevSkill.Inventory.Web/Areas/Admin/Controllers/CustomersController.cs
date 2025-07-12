@@ -133,7 +133,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 var customers = new
                 {
                     recordsTotal = total,
-                    recordsFiltred = totalDisplay,
+                    recordsFiltered = totalDisplay,
                     data = (from record in data
                             select new string[]
                             {
