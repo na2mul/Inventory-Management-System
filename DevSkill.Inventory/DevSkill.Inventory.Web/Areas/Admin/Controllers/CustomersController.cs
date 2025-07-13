@@ -10,6 +10,7 @@ using DevSkill.Inventory.Application.Features.Customers.Queries;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
+using DevSkill.Inventory.Application.Exceptions;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -56,7 +57,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                         Type = ResponseTypes.Success
                     });
                 }
-                catch (Application.Exceptions.DuplicateNameException de)
+                catch (DuplicateCustomerNameException de)
                 {
                     ModelState.AddModelError("DuplicateCustomer", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()
@@ -98,7 +99,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     });
                     return RedirectToAction("Index");
                 }
-                catch (Application.Exceptions.DuplicateNameException de)
+                catch (DuplicateCustomerNameException de)
                 {
                     ModelState.AddModelError("DuplicateCustomer", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()

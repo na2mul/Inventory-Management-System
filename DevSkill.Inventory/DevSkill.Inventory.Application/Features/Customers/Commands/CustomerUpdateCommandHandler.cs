@@ -31,7 +31,7 @@ namespace DevSkill.Inventory.Application.Features.Customers.Commands
                 await _applicationUnitOfWork.SaveAsync();
             }
             else
-                throw new DuplicateNameException("Customer");
+                throw new DuplicateCustomerNameException();
 
         }
     }

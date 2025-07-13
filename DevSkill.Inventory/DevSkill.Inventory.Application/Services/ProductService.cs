@@ -26,7 +26,7 @@ namespace DevSkill.Inventory.Application.Services
                 _applicationUnitOfWork.Save();
             }
             else
-                throw new DuplicateNameException("Product");
+                throw new DuplicateProductNameException();
         }
 
         public void DeleteProduct(Guid id)
@@ -60,7 +60,7 @@ namespace DevSkill.Inventory.Application.Services
                 _applicationUnitOfWork.Save();
             }
             else
-                throw new DuplicateNameException("Product");
+                throw new DuplicateProductNameException();
 
         }
     }

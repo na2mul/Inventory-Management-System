@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DevSkill.Inventory.Application.Exceptions
 {
-    public class DuplicateProductNameException : Exception
+    public class DuplicateMeasurementUnitNameException : Exception
     {
-        public DuplicateProductNameException() : base("Product Name can't be duplicate")
+        public DuplicateMeasurementUnitNameException() : base("MeasurementUnit Name can't be duplicate")
         {
 
         }

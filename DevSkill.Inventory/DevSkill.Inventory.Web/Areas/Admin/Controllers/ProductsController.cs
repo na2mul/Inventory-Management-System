@@ -67,7 +67,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                         Type = ResponseTypes.Success
                     });
                 }
-                catch (Application.Exceptions.DuplicateNameException de)
+                catch (DuplicateProductNameException de)
                 {
                     ModelState.AddModelError("DuplicateProduct", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()
@@ -114,7 +114,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     });
                     return RedirectToAction("Index");
                 }
-                catch (Application.Exceptions.DuplicateNameException de)
+                catch (DuplicateProductNameException de)
                 {
                     ModelState.AddModelError("DuplicateProduct", de.Message);
                     TempData.Put("ResponseMessage", new ResponseModel()
