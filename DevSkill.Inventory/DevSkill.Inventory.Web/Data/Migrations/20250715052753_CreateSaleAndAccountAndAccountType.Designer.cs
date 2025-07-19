@@ -4,6 +4,7 @@ using DevSkill.Inventory.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DevSkill.Inventory.Web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250715052753_CreateSaleAndAccountAndAccountType")]
+    partial class CreateSaleAndAccountAndAccountType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,13 +212,10 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Terms")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TotalAmount")
                         .HasColumnType("int");
 
-                    b.Property<double>("VatAmount")
+                    b.Property<double>("Vat")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
@@ -225,47 +225,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Sales");
-                });
-
-            modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.SalesDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Barcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SaleType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SalesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("SalesId");
-
-                    b.ToTable("SalesDetails");
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationRole", b =>
@@ -522,25 +481,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.SalesDetail", b =>
-                {
-                    b.HasOne("DevSkill.Inventory.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DevSkill.Inventory.Domain.Entities.Sale", "Sale")
-                        .WithMany("SalesDetails")
-                        .HasForeignKey("SalesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Sale");
-                });
-
             modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("DevSkill.Inventory.Infrastructure.Identity.ApplicationRole", null)
@@ -595,11 +535,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Sale", b =>
-                {
-                    b.Navigation("SalesDetails");
                 });
 #pragma warning restore 612, 618
         }

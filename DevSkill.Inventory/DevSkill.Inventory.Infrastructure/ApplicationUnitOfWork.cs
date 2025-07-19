@@ -17,6 +17,9 @@ namespace DevSkill.Inventory.Infrastructure
         public ICategoryRepository CategoryRepository { get; set; }
         public IMeasurementUnitRepository MeasurementUnitRepository { get; set; }
         public ICustomerRepository CustomerRepository { get; set; }
+        public ISaleRepository SaleRepository { get; set; }
+        public IAccountTypeRepository AccountTypeRepository { get; set; }
+        public IAccountRepository AccountRepository { get; set; }
 
         private readonly ApplicationDbContext _dbContext;
         public ApplicationUnitOfWork(
@@ -24,7 +27,10 @@ namespace DevSkill.Inventory.Infrastructure
             IProductRepository productRepository,
             ICategoryRepository categoryRepository,
             IMeasurementUnitRepository measurementUnitRepository,
-            ICustomerRepository customerRepository
+            ICustomerRepository customerRepository,
+            ISaleRepository saleRepository,
+            IAccountTypeRepository accountTypeRepository,
+            IAccountRepository accountRepository
             ) : base(context)
         {
             _dbContext = context;
@@ -32,6 +38,9 @@ namespace DevSkill.Inventory.Infrastructure
             CategoryRepository = categoryRepository;
             MeasurementUnitRepository = measurementUnitRepository;
             CustomerRepository = customerRepository;
+            SaleRepository = saleRepository;
+            AccountTypeRepository = accountTypeRepository;
+            AccountRepository = accountRepository;
         }
     }
 }

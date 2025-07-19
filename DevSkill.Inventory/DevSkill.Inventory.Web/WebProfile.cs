@@ -4,11 +4,14 @@ using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
+using DevSkill.Inventory.Application.Features.Sales.Commands;
 using DevSkill.Inventory.Domain.Dtos.ProductDtos;
+using DevSkill.Inventory.Domain.Dtos.SaleDtos;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Sales;
 
 namespace DevSkill.Inventory.Web
 {
@@ -34,6 +37,9 @@ namespace DevSkill.Inventory.Web
             CreateMap<CustomerUpdateCommand, Customer>().ReverseMap();
             CreateMap<CustomerUpdateCommand, UpdateCustomerModel>().ReverseMap();
             CreateMap<UpdateCustomerModel, Customer>().ReverseMap();
+            CreateMap<SaleAddCommand, Sale>().ReverseMap();
+            CreateMap<SaleAddCommand, AddSaleModel>().ReverseMap();
+            CreateMap<SaleItemDto, SalesDetail>().ReverseMap();
         }
     }
 }

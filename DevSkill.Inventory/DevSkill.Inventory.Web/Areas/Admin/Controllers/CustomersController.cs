@@ -11,6 +11,7 @@ using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Exceptions;
+using DevSkill.Inventory.Application.Features.Products.Queries;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -222,5 +223,19 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> GetCustomersAsync()
+        {
+            try
+            {
+                var customerList = await _mediator.Send(new CustomerGetAllQuery());
+                return Json(customerList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting customers";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
     }
 }

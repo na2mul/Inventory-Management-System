@@ -1,0 +1,160 @@
+﻿@using DevSkill.Inventory.Web.Areas.Admin.Models.Sales
+@model AddSaleModel
+
+<!-- Modal -->
+<div class="modal fade" id="addSaleModal" tabindex="-1" role="dialog" aria-labelledby="addSaleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: aliceblue;">
+                <h4 class="modal-title" id="addSaleModalLabel">New Sale Information</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-antiforgery="true" asp-area="Admin" asp-controller="Sales" asp-action="Add" method="POST" id="saleForm">
+                    <!-- Hidden field for Invoice Number -->
+                    <input asp-for="InvoiceNo" type="hidden" id="invoiceNo" />
+
+                    <div class="row">
+                        <div class="form-group col-md-3 col-sm-3 col-12 mb-3">
+                            <label class="form-label">Sale Date *</label>
+                            <input asp-for="SaleDate" type="datetime-local" id="saleDate" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-3 col-sm-3 col-12 mb-3">
+                            <label class="form-label">Select Customer *</label>
+                            <div class="input-group">
+                                <select asp-for="CustomerId" class="form-control select2 customer-select" required>
+                                    <option value="">Select a Customer *</option>
+                                </select>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="openCustomerModal()">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-3 col-sm-3 col-12 mb-3">
+                            <label for="saleType" class="form-label">Select Sales Type *</label>
+                            <select asp-for="SaleType" id="saleType" class="form-control" required>
+                                <option value="">Select One</option>
+                                <option value="1">MRP Sale</option>
+                                <option value="2">Whole Sale</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3 col-sm-3 col-12 mb-3">
+                            <label>Select Product *</label>
+                            <div>
+                                <select id="productId" class="form-control select2 product-select">
+                                    <option value="">Select a Product *</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 col-12 mb-3">
+                        <table id="saleTable" class="table table-bordered table-striped">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Barcode</th>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Sub Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-end">VAT (%)</td>
+                                    <td>
+                                        <input type="hidden" id="tsAmount" value="0">                                       
+                                        <input type="number" class="form-control" id="vCost" onkeyup="vatcostcalculator()" step="0.01" value="0" />                                        
+                                        <input asp-for="VatAmount" type="hidden" id="vatAmountHidden" value="0" />
+                                        <input type="hidden" name="vType" id="vType" value="0">
+                                        <input type="hidden" name="vAmount" id="vAmount" value="0">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end">Net Amount</td>
+                                    <td>                                       
+                                        <input type="number" class="form-control" id="nAmount" readonly step="0.01" value="0" />                                        
+                                        <input asp-for="NetAmount" type="hidden" id="netAmountHidden" value="0" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end">Discount</td>
+                                    <td>                                        
+                                        <input type="number" class="form-control" id="discount" onkeyup="discountType()" step="0.01" value="0" />                                      
+                                        <input asp-for="Discount" type="hidden" id="discountHidden" value="0" />
+                                        <input type="hidden" id="disType" name="disType" value="0">
+                                        <input type="hidden" id="disAmount" name="disAmount" value="0">
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Total Amount *</strong></td>
+                                    <td>                                        
+                                        <input type="number" class="form-control" id="totalprice" readonly step="0.01" value="0">                                        
+                                        <input asp-for="TotalAmount" type="hidden" id="totalAmountHidden" value="0" required>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Paid Amount *</strong></td>
+                                    <td>
+                                        <input asp-for="PaidAmount" type="number" class="form-control" id="total_paid" onkeyup="calculate_remain()" step="0.01" value="0" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end">Due Amount</td>
+                                    <td>                                        
+                                        <input type="number" class="form-control" id="total_remain" readonly step="0.01" value="0" />                                        
+                                        <input asp-for="DueAmount" type="hidden" id="dueAmountHidden" value="0" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4 col-sm-4 col-12 mb-3">                            
+                            
+                            <label for="accountType" class="form-label">Account Type *</label>
+                            <select asp-for="AccountTypeId" class="form-control select2 accountType-select" required>
+                                <option value="">Select Account Type</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 col-sm-4 col-12 mb-3">
+                            <label for="accountNo" class="form-label">Account No *</label>
+                            <select asp-for="AccountId" class="form-control"  required>
+                                <option value="">Select Account</option>                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 col-sm-4 col-12 mb-3">
+                            <label for="note" class="form-label">Note</label>
+                            <textarea asp-for="Notes" class="form-control" id="note" placeholder="If have any note" rows="3"></textarea>
+                        </div>
+                        <div class="form-group col-md-12 col-sm-12 col-12 mb-3">
+                            <label for="terms" class="form-label">Terms & Conditions</label>
+                            <textarea asp-for="Terms" class="form-control" id="terms" placeholder="Terms & Conditions" rows="4"></textarea>
+                        </div>
+                    </div>
+                    
+                    <input asp-for="Status" type="hidden" id="status" value="" />
+                    
+                    <div id="productsContainer"></div>                    
+
+                    <div class="modal-footer" style="background-color: aliceblue;">
+                        <button type="button" class="btn btn-secondary btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-square"></i>&nbsp;&nbsp;Cancel</button>
+                        <button type="submit" id="add-button" class="btn btn-primary"><i class="bi bi-floppy"></i>&nbsp;&nbsp;Save</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

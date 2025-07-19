@@ -52,5 +52,9 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
         {
             return await GetAllAsync();
         }
+        public async void GetProductBySaleTypeAsync(Guid id, int saleType)
+        {
+
+        }
     }
 }

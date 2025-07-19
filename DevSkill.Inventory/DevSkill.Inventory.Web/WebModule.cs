@@ -34,6 +34,9 @@ namespace DevSkill.Inventory.Web
             builder.RegisterType<CategoryRepository>().As<ICategoryRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MeasurementUnitRepository>().As<IMeasurementUnitRepository>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerRepository>().As<ICustomerRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SaleRepository>().As<ISaleRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AccountTypeRepository>().As<IAccountTypeRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AccountRepository>().As<IAccountRepository>().InstancePerLifetimeScope();
             builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
             builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
 
