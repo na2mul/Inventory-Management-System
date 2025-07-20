@@ -1,0 +1,66 @@
+﻿using AutoMapper;
+using DevSkill.Inventory.Application.Features.TransferAccounts.Queries;
+using DevSkill.Inventory.Domain;
+using DevSkill.Inventory.Infrastructure.Utilities;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using System.Web;
+
+namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+    public class TransferAccountsController : Controller
+    {
+        private readonly ILogger<TransferAccountsController> _logger;
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+
+        public TransferAccountsController(
+            ILogger<TransferAccountsController> logger,
+            IMapper mapper,
+            IMediator mediator)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _mediator = mediator;
+        }
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetTransferAccountJsonDataAsync([FromBody] TransferAccountGetListQuery query)
+        {
+            try
+            {
+                var (data, total, totalDisplay) = await _mediator.Send(query);
+
+                var transferAccount = new
+                {
+                    recordsTotal = total,
+                    recordsFiltered = totalDisplay,
+                    data = (from record in data
+                            select new string[]
+                            {
+                                record.Id.ToString(),                                
+                                record.TransferDate,
+                                HttpUtility.HtmlEncode(record.FromAccountDisplay),
+                                HttpUtility.HtmlEncode(record.ToAccountDisplay),
+                                record.TransferAmount.ToString(),
+                                HttpUtility.HtmlEncode(record.Note),
+                                record.Id.ToString()
+                            }).ToArray()
+                };
+
+                return Json(transferAccount);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There was a problem in getting books");
+                return Json(DataTables.EmptyResult);
+            }
+        }
+    }
+}

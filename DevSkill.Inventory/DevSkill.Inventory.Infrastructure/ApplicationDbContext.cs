@@ -26,6 +26,8 @@ namespace DevSkill.Inventory.Infrastructure
         public DbSet<AccountType> AccountTypes { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<SalesDetail> SalesDetails { get; set; }
+        public DbSet<TransferAccount> TransferAccounts { get; set; }
+
 
         public ApplicationDbContext(string connectionString, string migrationAssembly)
         {
@@ -69,6 +71,20 @@ namespace DevSkill.Inventory.Infrastructure
                       .HasForeignKey(d => d.ProductId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            builder.Entity<TransferAccount>(entity =>
+            {               
+                entity.HasOne(e => e.FromAccount)
+                      .WithMany()
+                      .HasForeignKey(e => e.FromAccountId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ToAccount)
+                      .WithMany()
+                      .HasForeignKey(e => e.ToAccountId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
 
             base.OnModelCreating(builder);
         }

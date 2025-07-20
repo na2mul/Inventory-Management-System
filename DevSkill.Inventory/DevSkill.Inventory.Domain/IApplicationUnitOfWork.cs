@@ -11,5 +11,6 @@ namespace DevSkill.Inventory.Domain
         public ISaleRepository SaleRepository { get; }
         public IAccountTypeRepository AccountTypeRepository { get; }
         public IAccountRepository AccountRepository { get; }
+        public ITransferAccountRepository TransferAccountRepository { get; }
     }
 }
