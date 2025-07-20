@@ -388,7 +388,7 @@
                     var saleType = $('#saleType').val();
                     var saleTypeText = saleType === '1' ? 'MRP' : 'Wholesale';
 
-                    
+
                     var product = {
                         ProductId: jsondata.Id.toString(),
                         Barcode: jsondata.Barcode || '',
@@ -414,7 +414,6 @@
                                    data-price="${product.UnitPrice}" data-product-id="${product.ProductId}">
                         </td>
                         <td>${product.UnitPrice.toFixed(2)}</td>
-                        <td>${product.SaleType}</td>
                         <td class="subtotal">${product.SubTotal.toFixed(2)}</td>
                         <td>
                             <button type="button" class="btn btn-danger btn-sm remove-btn" data-product-id="${product.ProductId}">
@@ -531,48 +530,55 @@
         var vatAmount = (totalSubtotal * vatPercent) / 100;
         $('#vAmount').val(vatAmount);
 
-        // Calculate net amount (subtotal + VAT)
-        var netAmount = totalSubtotal + vatAmount;
+        // Calculate net amount (subtotal + VAT) - ROUND TO INTEGER FOR SERVER
+        var netAmountDecimal = totalSubtotal + vatAmount;
+        var netAmountInteger = Math.round(netAmountDecimal);
 
-        // Calculate discount
+        // Calculate discount based on INTEGER net amount
         var discountPercent = parseFloat($('#discount').val()) || 0;
-        var discountAmount = (netAmount * discountPercent) / 100;
-        $('#disAmount').val(discountAmount);
+        var discountAmountDecimal = (netAmountInteger * discountPercent) / 100;
+        var discountAmountInteger = Math.round(discountAmountDecimal);
+        $('#disAmount').val(discountAmountDecimal);
 
-        // Calculate final total (net amount - discount)
-        var finalTotal = netAmount - discountAmount;
+        // Calculate final total (INTEGER net amount - INTEGER discount)
+        var totalAmountInteger = netAmountInteger - discountAmountInteger;
 
         // Calculate due amount
         var paidAmount = parseFloat($('#total_paid').val()) || 0;
-        var dueAmount = finalTotal - paidAmount;
+        var paidAmountInteger = Math.round(paidAmount);
+        var dueAmountInteger = totalAmountInteger - paidAmountInteger;
 
-        // Update DISPLAY fields
-        $('#nAmount').val(netAmount.toFixed(2));
-        $('#totalprice').val(finalTotal.toFixed(2));
-        $('#total_remain').val(dueAmount.toFixed(2));
+        // Update DISPLAY fields (keep decimals for user interface)
+        $('#nAmount').val(netAmountDecimal.toFixed(2));
+        $('#totalprice').val(totalAmountInteger.toFixed(2)); // Show integer as decimal format
+        $('#total_remain').val(dueAmountInteger.toFixed(2)); // Show integer as decimal format
 
-        // Update HIDDEN fields that will be submitted to server
+        // Update HIDDEN fields that will be submitted to server - ALL AS INTEGERS
         $('#vatAmountHidden').val(Math.round(vatAmount));
-        $('#netAmountHidden').val(Math.round(netAmount));
-        $('#discountHidden').val(Math.round(discountAmount));
-        $('#totalAmountHidden').val(Math.round(finalTotal));
-        $('#dueAmountHidden').val(Math.round(dueAmount));
+        $('#netAmountHidden').val(netAmountInteger);
+        $('#discountHidden').val(discountAmountInteger);
+        $('#totalAmountHidden').val(totalAmountInteger);
+        $('#dueAmountHidden').val(dueAmountInteger);
+        $('#paidAmountHidden').val(paidAmountInteger);
 
         // Debug logging
         console.log('Calculation Debug:', {
             totalSubtotal: totalSubtotal,
             vatAmount: vatAmount,
-            netAmount: netAmount,
-            discountAmount: discountAmount,
-            finalTotal: finalTotal,
-            paidAmount: paidAmount,
-            dueAmount: dueAmount,
+            netAmountDecimal: netAmountDecimal,
+            netAmountInteger: netAmountInteger,
+            discountAmountDecimal: discountAmountDecimal,
+            discountAmountInteger: discountAmountInteger,
+            totalAmountInteger: totalAmountInteger,
+            paidAmountInteger: paidAmountInteger,
+            dueAmountInteger: dueAmountInteger,
             hiddenValues: {
                 vatAmountHidden: $('#vatAmountHidden').val(),
                 netAmountHidden: $('#netAmountHidden').val(),
                 discountHidden: $('#discountHidden').val(),
                 totalAmountHidden: $('#totalAmountHidden').val(),
-                dueAmountHidden: $('#dueAmountHidden').val()
+                dueAmountHidden: $('#dueAmountHidden').val(),
+                paidAmountHidden: $('#paidAmountHidden').val()
             }
         });
     }
@@ -596,6 +602,7 @@
         $('#discountHidden').val(0);
         $('#totalAmountHidden').val(0);
         $('#dueAmountHidden').val(0);
+        $('#paidAmountHidden').val(0);
     }
 
     // VAT calculation function (called from HTML)
@@ -683,8 +690,45 @@
             }
         }
 
+        // ENSURE AMOUNTS ARE SET AS INTEGERS BEFORE SUBMISSION
+        var paidAmountInteger = Math.round(parseFloat($('#total_paid').val()) || 0);
+        var netAmountInteger = parseInt($('#netAmountHidden').val()) || 0;
+        var totalAmountInteger = parseInt($('#totalAmountHidden').val()) || 0;
+
+        // Remove existing hidden fields if they exist and add new ones
+        $('#paidAmountHidden').remove();
+        $('#netAmountHidden').remove();
+        $('#totalAmountHidden').remove();
+
+        // Add integer hidden fields for model binding
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'paidAmountHidden',
+            name: 'PaidAmount', // Make sure this matches your model property name
+            value: paidAmountInteger
+        }).appendTo('#saleForm');
+
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'netAmountHidden',
+            name: 'NetAmount', // Make sure this matches your model property name
+            value: netAmountInteger
+        }).appendTo('#saleForm');
+
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'totalAmountHidden',
+            name: 'TotalAmount', // Make sure this matches your model property name
+            value: totalAmountInteger
+        }).appendTo('#saleForm');
+
         // Log all form data being submitted
         console.log('Products being submitted:', saleProducts);
+        console.log('Integer Values:', {
+            paidAmount: paidAmountInteger,
+            netAmount: netAmountInteger,
+            totalAmount: totalAmountInteger
+        });
         console.log('Form data being submitted:');
 
         var formData = new FormData(this);
