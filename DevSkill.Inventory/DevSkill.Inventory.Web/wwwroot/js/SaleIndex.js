@@ -246,7 +246,8 @@
                 alert('Failed to load AccountTypes.');
             });
     }
-    // Initialize Customers Select2
+
+    // Initialize AccountTypes Select2
     $('#addSaleModal').on('shown.bs.modal', function () {
         const $modal = $(this);
         const $select = $modal.find('.accountType-select');
@@ -316,9 +317,9 @@
     }
 
     // Add this to your existing document ready function or create a new one
-    $(document).ready(function () {        
+    $(document).ready(function () {
         var allAccounts = [];
-        
+
         $('#AccountTypeId').change(function () {
             var accountTypeId = $(this).val();
             var $accountDropdown = $('#AccountId');
@@ -328,6 +329,7 @@
             // Load accounts based on selected type
             loadAccountsByType(accountTypeId, $accountDropdown);
         });
+
         // Reset account dropdown when modal is closed
         $('#addSaleModal').on('hidden.bs.modal', function () {
             $('#AccountId').empty().append('<option value="">Select Account</option>');
@@ -338,7 +340,6 @@
         $('#AccountId').empty().append('<option value="">Select Account Type First</option>');
         $('#AccountId').prop('disabled', true);
     });
-
 
     // Temp data response fadeOut
     $(document).ready(function () {
@@ -384,40 +385,44 @@
                 }
                 else {
                     var jsondata = JSON.parse(data);
+                    var saleType = $('#saleType').val();
+                    var saleTypeText = saleType === '1' ? 'MRP' : 'Wholesale';
 
-                    // Add product to array
+                    
                     var product = {
-                        ProductId: jsondata.Id,
-                        Barcode: jsondata.Barcode,
-                        ProductName: jsondata.Name,
+                        ProductId: jsondata.Id.toString(),
+                        Barcode: jsondata.Barcode || '',
+                        ProductName: jsondata.Name || '',
                         Quantity: parseInt(jsondata.Quantity) || 1,
                         UnitPrice: parseFloat(jsondata.Price) || 0,
                         SubTotal: parseFloat(jsondata.Subtotal) || 0,
-                        StockAvailable: parseInt(jsondata.Stock) || 0
+                        StockAvailable: parseInt(jsondata.Stock) || 0,
+                        SaleType: saleTypeText
                     };
 
                     saleProducts.push(product);
 
                     // Create HTML table row
                     var tableRow = `
-                        <tr data-product-id="${jsondata.Id}">
-                            <td>${jsondata.Barcode}</td>
-                            <td>${jsondata.Name}</td>
-                            <td>${jsondata.Stock}</td>
-                            <td>
-                                <input type="number" class="form-control quantity-input" 
-                                       value="${product.Quantity}" min="1" max="${jsondata.Stock}" 
-                                       data-price="${product.UnitPrice}" data-product-id="${jsondata.Id}">
-                            </td>
-                            <td>${product.UnitPrice.toFixed(2)}</td>
-                            <td class="subtotal">${product.SubTotal.toFixed(2)}</td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm remove-btn" data-product-id="${jsondata.Id}">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    <tr data-product-id="${product.ProductId}">
+                        <td>${product.Barcode}</td>
+                        <td>${product.ProductName}</td>
+                        <td>${product.StockAvailable}</td>
+                        <td>
+                            <input type="number" class="form-control quantity-input" 
+                                   value="${product.Quantity}" min="1" max="${product.StockAvailable}" 
+                                   data-price="${product.UnitPrice}" data-product-id="${product.ProductId}">
+                        </td>
+                        <td>${product.UnitPrice.toFixed(2)}</td>
+                        <td>${product.SaleType}</td>
+                        <td class="subtotal">${product.SubTotal.toFixed(2)}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm remove-btn" data-product-id="${product.ProductId}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
                     $('#tbody').append(tableRow);
                     $('#productId').val('').trigger('change');
                     calculatePrice();
@@ -446,7 +451,7 @@
         var quantity = parseInt($(element).val()) || 0;
         var price = parseFloat($(element).data('price')) || 0;
         var maxStock = parseInt($(element).attr('max')) || 0;
-        var productId = $(element).data('product-id');
+        var productId = $(element).data('product-id').toString(); // Ensure it's a string
 
         // Validate quantity doesn't exceed stock
         if (quantity > maxStock) {
@@ -461,8 +466,8 @@
         // Update the subtotal cell in the same row
         $row.find('.subtotal').text(subtotal.toFixed(2));
 
-        // Update the product in the array
-        var product = saleProducts.find(p => p.ProductId === productId);
+        // Update the product in the array (compare as strings)
+        var product = saleProducts.find(p => p.ProductId.toString() === productId);
         if (product) {
             product.Quantity = quantity;
             product.SubTotal = subtotal;
@@ -476,10 +481,10 @@
     // Remove a row
     function removeRow(element) {
         if (confirm('Are you sure you want to remove this product?')) {
-            var productId = $(element).data('product-id');
+            var productId = $(element).data('product-id').toString(); // Ensure it's a string
 
-            // Remove from products array
-            saleProducts = saleProducts.filter(p => p.ProductId !== productId);
+            // Remove from products array (compare as strings)
+            saleProducts = saleProducts.filter(p => p.ProductId.toString() !== productId);
 
             // Remove from table
             $(element).closest('tr').remove();
@@ -491,6 +496,22 @@
                 resetTotals();
             }
         }
+    }
+
+    // Update products hidden fields for proper model binding
+    function updateProductsHiddenFields() {
+        $('#productsContainer').empty();
+        saleProducts.forEach(function (p, i) {
+            $('#productsContainer').append(`
+                <input type="hidden" name="Products[${i}].ProductId" value="${p.ProductId}" />
+                <input type="hidden" name="Products[${i}].Barcode" value="${p.Barcode}" />
+                <input type="hidden" name="Products[${i}].Quantity" value="${p.Quantity}" />
+                <input type="hidden" name="Products[${i}].UnitPrice" value="${p.UnitPrice}" />
+                <input type="hidden" name="Products[${i}].SubTotal" value="${p.SubTotal}" />
+                <input type="hidden" name="Products[${i}].StockAvailable" value="${p.StockAvailable}" />
+                <input type="hidden" name="Products[${i}].SaleType" value="${p.SaleType}" />
+            `);
+        });
     }
 
     // Calculate total price and update BOTH display AND hidden fields
@@ -530,7 +551,7 @@
         $('#totalprice').val(finalTotal.toFixed(2));
         $('#total_remain').val(dueAmount.toFixed(2));
 
-        // CRITICAL: Update HIDDEN fields that will be submitted to server
+        // Update HIDDEN fields that will be submitted to server
         $('#vatAmountHidden').val(Math.round(vatAmount));
         $('#netAmountHidden').val(Math.round(netAmount));
         $('#discountHidden').val(Math.round(discountAmount));
@@ -577,26 +598,6 @@
         $('#dueAmountHidden').val(0);
     }
 
-    // Update hidden fields for products array
-    function updateProductsHiddenFields() {
-        // Clear existing hidden fields
-        $('#productsContainer').empty();
-
-        // Add hidden fields for each product
-        saleProducts.forEach(function (product, index) {
-            var hiddenFields = `
-                <input type="hidden" name="Products[${index}].ProductId" value="${product.ProductId}" />
-                <input type="hidden" name="Products[${index}].Barcode" value="${product.Barcode}" />
-                <input type="hidden" name="Products[${index}].ProductName" value="${product.ProductName}" />
-                <input type="hidden" name="Products[${index}].Quantity" value="${product.Quantity}" />
-                <input type="hidden" name="Products[${index}].UnitPrice" value="${product.UnitPrice}" />
-                <input type="hidden" name="Products[${index}].SubTotal" value="${product.SubTotal}" />
-                <input type="hidden" name="Products[${index}].StockAvailable" value="${product.StockAvailable}" />
-            `;
-            $('#productsContainer').append(hiddenFields);
-        });
-    }
-
     // VAT calculation function (called from HTML)
     window.vatcostcalculator = function () {
         calculatePrice();
@@ -611,38 +612,6 @@
     window.calculate_remain = function () {
         calculatePrice(); // Recalculate everything when paid amount changes
     }
-
-    //// Debug button functionality
-    //$('#debugButton').click(function () {
-    //    var formData = new FormData($('#saleForm')[0]);
-    //    var debugInfo = {
-    //        'Display Values': {
-    //            totalprice: $('#totalprice').val(),
-    //            nAmount: $('#nAmount').val(),
-    //            total_remain: $('#total_remain').val(),
-    //            total_paid: $('#total_paid').val(),
-    //            vCost: $('#vCost').val(),
-    //            discount: $('#discount').val()
-    //        },
-    //        'Hidden Field Values': {
-    //            totalAmountHidden: $('#totalAmountHidden').val(),
-    //            netAmountHidden: $('#netAmountHidden').val(),
-    //            dueAmountHidden: $('#dueAmountHidden').val(),
-    //            vatAmountHidden: $('#vatAmountHidden').val(),
-    //            discountHidden: $('#discountHidden').val()
-    //        },
-    //        'Form Data Entries': {}
-    //    };
-
-    //    // Get all form data
-    //    for (var pair of formData.entries()) {
-    //        debugInfo['Form Data Entries'][pair[0]] = pair[1];
-    //    }
-
-    //    console.log('=== FORM DEBUG INFO ===');
-    //    console.log(debugInfo);
-    //    alert('Debug info logged to console. Check browser developer tools.');
-    //});
 
     // Form validation
     function validateSaleForm() {
@@ -678,10 +647,13 @@
         return true;
     }
 
-    // Form submission handling
+    // Form submission handling with proper debugging
     $('#saleForm').on('submit', function (e) {
+        console.log('Form submission started...');
+
         if (!validateSaleForm()) {
             e.preventDefault();
+            console.log('Form validation failed');
             return false;
         }
 
@@ -693,7 +665,7 @@
 
         // Generate invoice number if not set
         if (!$('#invoiceNo').val()) {
-            var invoiceNo = 'INV-' + new Date().getTime();
+            var invoiceNo = 'INV-DEV' + new Date().getTime();
             $('#invoiceNo').val(invoiceNo);
         }
 
@@ -711,24 +683,26 @@
             }
         }
 
-        // Final debug before submission
-        //console.log('=== FINAL FORM SUBMISSION VALUES ===');
-        //console.log('Hidden field values that will be submitted:', {
-        //    TotalAmount: $('#totalAmountHidden').val(),
-        //    NetAmount: $('#netAmountHidden').val(),
-        //    DueAmount: $('#dueAmountHidden').val(),
-        //    PaidAmount: $('#total_paid').val(),
-        //    Discount: $('#discountHidden').val(),
-        //    VatAmount: $('#vatAmountHidden').val(),
-        //    Status: $('#status').val(),
-        //    InvoiceNo: $('#invoiceNo').val()
-        //});
+        // Log all form data being submitted
+        console.log('Products being submitted:', saleProducts);
+        console.log('Form data being submitted:');
 
+        var formData = new FormData(this);
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        // Log serialized form data
+        console.log('Serialized form data:', $(this).serialize());
+
+        console.log('Form submission proceeding...');
         return true;
     });
 
     // Initialize modal when shown
     $('#addSaleModal').on('shown.bs.modal', function () {
+        console.log('Modal opened - initializing form');
+
         // Reset form and arrays
         saleProducts = [];
         $('#tbody').empty();
@@ -765,4 +739,3 @@
         console.log('Sale form JavaScript initialized with proper form submission handling');
     });
 });
-

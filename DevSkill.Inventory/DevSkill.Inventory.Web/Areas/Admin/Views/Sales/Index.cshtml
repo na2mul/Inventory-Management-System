@@ -1,4 +1,5 @@
-﻿@{
+﻿@using DevSkill.Inventory.Web.Areas.Admin.Models.Sales
+@{
     ViewData["Title"] = "Sale";
 }
 
@@ -138,7 +139,7 @@
                     </div>
 
                     <div class="card-body table-responsive px-4">
-                        <partial name="./_Add" />
+                        <partial name="./_Add" model='new AddSaleModel()' />
                         <partial name ="./_AddCustomerModal" />
                         @* <partial name="./_Update" /> *@
                         <partial name="_ResponsePartial" />

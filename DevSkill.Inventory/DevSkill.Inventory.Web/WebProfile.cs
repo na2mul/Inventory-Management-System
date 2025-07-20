@@ -36,10 +36,17 @@ namespace DevSkill.Inventory.Web
             CreateMap<CustomerAddCommand, AddCustomerModel>().ReverseMap();
             CreateMap<CustomerUpdateCommand, Customer>().ReverseMap();
             CreateMap<CustomerUpdateCommand, UpdateCustomerModel>().ReverseMap();
-            CreateMap<UpdateCustomerModel, Customer>().ReverseMap();
-            CreateMap<SaleAddCommand, Sale>().ReverseMap();
-            CreateMap<SaleAddCommand, AddSaleModel>().ReverseMap();
+            CreateMap<UpdateCustomerModel, Customer>().ReverseMap();            
+            CreateMap<Sale, SaleAddCommand>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.SalesDetails));
+            CreateMap<SaleAddCommand, Sale>()
+                .ForMember(dest => dest.SalesDetails, opt => opt.MapFrom(src => src.Items));
+            CreateMap<AddSaleModel, SaleAddCommand>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Products));
+            CreateMap<SaleAddCommand, AddSaleModel>()
+                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Items));
             CreateMap<SaleItemDto, SalesDetail>().ReverseMap();
+            CreateMap<SaleProductModel, SaleItemDto>().ReverseMap();
         }
     }
 }

@@ -57,6 +57,7 @@
                                     <th>Stock</th>
                                     <th>Quantity</th>
                                     <th>Unit Price</th>
+                                    <th>Sale Type</th>
                                     <th>Sub Total</th>
                                     <th>Action</th>
                                 </tr>
@@ -67,8 +68,8 @@
                                 <tr>
                                     <td colspan="5" class="text-end">VAT (%)</td>
                                     <td>
-                                        <input type="hidden" id="tsAmount" value="0">                                       
-                                        <input type="number" class="form-control" id="vCost" onkeyup="vatcostcalculator()" step="0.01" value="0" />                                        
+                                        <input type="hidden" id="tsAmount" value="0">
+                                        <input type="number" class="form-control" id="vCost" onkeyup="vatcostcalculator()" step="0.01" value="0" />
                                         <input asp-for="VatAmount" type="hidden" id="vatAmountHidden" value="0" />
                                         <input type="hidden" name="vType" id="vType" value="0">
                                         <input type="hidden" name="vAmount" id="vAmount" value="0">
@@ -77,16 +78,16 @@
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-end">Net Amount</td>
-                                    <td>                                       
-                                        <input type="number" class="form-control" id="nAmount" readonly step="0.01" value="0" />                                        
+                                    <td>
+                                        <input type="number" class="form-control" id="nAmount" readonly step="0.01" value="0" />
                                         <input asp-for="NetAmount" type="hidden" id="netAmountHidden" value="0" />
                                     </td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-end">Discount</td>
-                                    <td>                                        
-                                        <input type="number" class="form-control" id="discount" onkeyup="discountType()" step="0.01" value="0" />                                      
+                                    <td>
+                                        <input type="number" class="form-control" id="discount" onkeyup="discountType()" step="0.01" value="0" />
                                         <input asp-for="Discount" type="hidden" id="discountHidden" value="0" />
                                         <input type="hidden" id="disType" name="disType" value="0">
                                         <input type="hidden" id="disAmount" name="disAmount" value="0">
@@ -95,8 +96,8 @@
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-end"><strong>Total Amount *</strong></td>
-                                    <td>                                        
-                                        <input type="number" class="form-control" id="totalprice" readonly step="0.01" value="0">                                        
+                                    <td>
+                                        <input type="number" class="form-control" id="totalprice" readonly step="0.01" value="0">
                                         <input asp-for="TotalAmount" type="hidden" id="totalAmountHidden" value="0" required>
                                     </td>
                                     <td></td>
@@ -110,8 +111,8 @@
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-end">Due Amount</td>
-                                    <td>                                        
-                                        <input type="number" class="form-control" id="total_remain" readonly step="0.01" value="0" />                                        
+                                    <td>
+                                        <input type="number" class="form-control" id="total_remain" readonly step="0.01" value="0" />
                                         <input asp-for="DueAmount" type="hidden" id="dueAmountHidden" value="0" />
                                     </td>
                                     <td></td>
