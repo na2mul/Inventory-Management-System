@@ -1,10 +1,16 @@
 ﻿using AutoMapper;
+using DevSkill.Inventory.Application.Exceptions;
+using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.TransferAccounts.Queries;
 using DevSkill.Inventory.Domain;
-using DevSkill.Inventory.Infrastructure.Utilities;
+using DevSkill.Inventory.Infrastructure;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
+using DevSkill.Inventory.Web.Areas.Admin.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
+using DevSkill.Inventory.Web.Areas.Admin.Models.TransferAccounts;
+using DevSkill.Inventory.Application.Features.TransferAccounts.Commands;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -27,6 +33,37 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddAsync(AddTransferAccountModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {                    
+                    var transferAccount = _mapper.Map<TransferAccountAddCommand>(model);                    
+                    transferAccount.Id = IdentityGenerator.NewSequentialGuid();
+                    await _mediator.Send(transferAccount);
+
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "transferAccount Added",
+                        Type = ResponseTypes.Success
+                    });
+                }                
+                catch (Exception ex)
+                {
+                    string message = "Failed to add transferAccount";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -54,7 +91,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 };
 
                 return Json(transferAccount);
-
             }
             catch (Exception ex)
             {

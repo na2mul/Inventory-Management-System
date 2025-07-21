@@ -5,12 +5,11 @@
         responsive: true,
         lengthChange: true,
         autoWidth: false,
-        searching: false,
         lengthMenu: [
             [10, 25, 50, -1],
             [10, 25, 50, "All"]
         ],
-        dom: '<"row mb-2"<"col-sm-12"l>>' +
+        dom: '<"row mb-2"<"col-sm-12"l><"col-sm-12 text-end"f>>' +
             '<"row mb-2"<"col-sm-12"B>>' +
             '<"row"<"col-sm-12"tr>>' +
             '<"row mt-2"<"col-sm-6"i><"col-sm-6"p>>',
@@ -112,5 +111,148 @@
 
     $('#delete-button').click(function () {
         $('#delete-form').submit();
+    });
+
+    // Load AccountTypes
+    function accountTypes($dropdown) {
+        return $.getJSON('/Admin/Sales/GetAccountTypes')
+            .done(function (list) {
+                $dropdown.empty().append('<option value="">Select one*</option>');
+                list.forEach(function (at) {
+                    $dropdown.append(`<option value="${at.id}">${at.name}</option>`);
+                });
+                $dropdown.trigger('change');
+            })
+            .fail(function () {
+                alert('Failed to load AccountTypes.');
+            });
+    }
+
+    // Function to load accounts based on account type
+    function loadAccountsByType(accountTypeId, $dropdown) {
+        // Clear the accounts dropdown
+        $dropdown.empty().append('<option value="">Loading accounts...</option>');
+        $dropdown.prop('disabled', true);
+
+        if (!accountTypeId || accountTypeId === '') {
+            $dropdown.empty().append('<option value="">Select Account Type First</option>');
+            $dropdown.prop('disabled', true);
+            return;
+        }
+
+        // Make AJAX call to get accounts by type
+        $.ajax({
+            url: '/Admin/Sales/GetAccountsByType',
+            type: 'GET',
+            data: { accountTypeId: accountTypeId },
+            dataType: 'json',
+            success: function (accounts) {                
+                $dropdown.empty();
+                if (accounts && accounts.length > 0) {                    
+                    $dropdown.append('<option value="">Select Account</option>');                    
+                    accounts.forEach(function (account) {
+                        $dropdown.append(`<option value="${account.id}">${account.accountName}</option>`);
+                    });                    
+                    $dropdown.prop('disabled', false);
+                    console.log(`Loaded ${accounts.length} accounts for account type ${accountTypeId}`);
+                } else {                    
+                    $dropdown.append('<option value="">No accounts available</option>');
+                    $dropdown.prop('disabled', true);
+                    console.log(`No accounts found for account type ${accountTypeId}`);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error loading accounts:', error);
+                $dropdown.empty().append('<option value="">Error loading accounts</option>');
+                $dropdown.prop('disabled', true);                
+                alert('Failed to load accounts. Please try again.');
+            }
+        });
+    }
+
+    // Initialize AccountTypes Select2 when modal is shown
+    $('#addBalanceTransferModal').on('shown.bs.modal', function () {
+        const $modal = $(this);
+
+        // Set current datetime to hidden field
+        const now = new Date();
+        const currentDateTime = now.toISOString().slice(0, 19); // Format: YYYY-MM-DDTHH:mm:ss
+        $modal.find('input[name="TransferDate"]').val(currentDateTime);
+
+        // Initialize sender account type dropdown
+        const $senderAccountType = $modal.find('#SenderAccountTypeId');
+        if (!$senderAccountType.hasClass('select2-hidden-accessible')) {
+            accountTypes($senderAccountType).then(() => {
+                $senderAccountType.select2({
+                    allowClear: false,
+                    width: 'resolve',
+                    dropdownParent: $modal
+                });
+            });
+        }
+
+        // Initialize receiver account type dropdown
+        const $receiverAccountType = $modal.find('#ReceiverAccountTypeId');
+        if (!$receiverAccountType.hasClass('select2-hidden-accessible')) {
+            accountTypes($receiverAccountType).then(() => {
+                $receiverAccountType.select2({
+                    allowClear: false,
+                    width: 'resolve',
+                    dropdownParent: $modal
+                });
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        // Handle sender account type change
+        $(document).on('change', '#SenderAccountTypeId', function () {
+            var accountTypeId = $(this).val();
+            var $accountDropdown = $('#FromAccountId');
+            console.log('Sender account type changed to:', accountTypeId);
+
+            // Load accounts based on selected type
+            loadAccountsByType(accountTypeId, $accountDropdown);
+        });
+
+        // Handle receiver account type change
+        $(document).on('change', '#ReceiverAccountTypeId', function () {
+            var accountTypeId = $(this).val();
+            var $accountDropdown = $('#ToAccountId');
+            console.log('Receiver account type changed to:', accountTypeId);
+
+            // Load accounts based on selected type
+            loadAccountsByType(accountTypeId, $accountDropdown);
+        });
+
+        // Reset dropdowns when modal is closed
+        $('#addBalanceTransferModal').on('hidden.bs.modal', function () {
+            // Reset sender dropdowns
+            $('#FromAccountId').empty().append('<option value="">Select Account</option>');
+            $('#SenderAccountTypeId').val('').trigger('change');
+
+            // Reset receiver dropdowns
+            $('#ToAccountId').empty().append('<option value="">Select Account</option>');
+            $('#ReceiverAccountTypeId').val('').trigger('change');
+
+            // Destroy Select2 instances to prevent memory leaks
+            if ($('#SenderAccountTypeId').hasClass('select2-hidden-accessible')) {
+                $('#SenderAccountTypeId').select2('destroy');
+            }
+            if ($('#ReceiverAccountTypeId').hasClass('select2-hidden-accessible')) {
+                $('#ReceiverAccountTypeId').select2('destroy');
+            }
+        });
+
+        // Initialize account dropdowns state on page load
+        $('#FromAccountId').empty().append('<option value="">Select Account Type First</option>');
+        $('#FromAccountId').prop('disabled', true);
+
+        $('#ToAccountId').empty().append('<option value="">Select Account Type First</option>');
+        $('#ToAccountId').prop('disabled', true);
+    });
+
+    $("#searchButton").click(function () {
+        $('#transferAccount').DataTable().ajax.reload(null, false);
     });
 });

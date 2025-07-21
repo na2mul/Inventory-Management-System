@@ -316,7 +316,7 @@
         });
     }
 
-    // Add this to your existing document ready function or create a new one
+    
     $(document).ready(function () {
         var allAccounts = [];
 

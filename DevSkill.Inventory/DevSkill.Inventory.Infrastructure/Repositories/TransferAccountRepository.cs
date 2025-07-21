@@ -21,7 +21,10 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
         }
 
         public (IList<TransferAccountDto> data, int total, int totalDisplay) GetPagedTransferAccounts(
-     int pageIndex, int pageSize, string? order, DataTablesSearch search)
+            int pageIndex,
+            int pageSize,
+            string? order,
+            DataTablesSearch search)
         {
             Expression<Func<TransferAccount, bool>> filter = null;
 
@@ -61,7 +64,5 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
 
             return (dtoList, total, totalDisplay);
         }
-
-
     }
 }

@@ -34,7 +34,7 @@
             <!-- Optional content -->
         </div>
         <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">            
-            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#balanceTransferModal">
+            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#addBalanceTransferModal">
                 <i class="fas fa-plus me-1"></i>Balance Transfer
             </button>
         </div>
@@ -48,13 +48,11 @@
             <div class="col-md-12">                
                 <!-- Transfer Account  Table -->
                 <div class="card shadow">
-                    <div class="card-header">
+                    <div class="card-header"> 
                         <h3 class="card-title mb-0">Available Transfer Account</h3>
                     </div>
-
                     <div class="card-body table-responsive px-4">
-                        @* <partial name="./_Add" /> *@
-                        
+                        <partial name="./_Add" />                        
                         <partial name="_ResponsePartial" />
                         <partial name="_DeleteModalPartial" />
 
