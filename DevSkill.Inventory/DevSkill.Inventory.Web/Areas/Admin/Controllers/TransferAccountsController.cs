@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using DevSkill.Inventory.Application.Exceptions;
-using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.TransferAccounts.Queries;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Infrastructure;
-using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +51,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }                
                 catch (Exception ex)
                 {
-                    string message = "Failed to add transferAccount";
+                    string message = "Failed to add transfer Account";
                     _logger.LogError(ex, message);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
@@ -94,9 +91,34 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "There was a problem in getting books");
+                _logger.LogError(ex, "There was a problem in getting Transfer Accounts");
                 return Json(DataTables.EmptyResult);
             }
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            try
+            {
+                await _mediator.Send(new TransferAccountDeleteCommand() { Id = id });
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = "Transfer Account Deleted",
+                    Type = ResponseTypes.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                string message = "Failed to delete Transfer Account";
+                _logger.LogError(ex, message);
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = message,
+                    Type = ResponseTypes.Danger
+                });
+            }
+            return RedirectToAction("Index");
         }
     }
 }

@@ -252,6 +252,13 @@
         $('#ToAccountId').prop('disabled', true);
     });
 
+    // temp data response fadeOut
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#response-alert').fadeOut('slow');
+        }, 4000);
+    });
+
     $("#searchButton").click(function () {
         $('#transferAccount').DataTable().ajax.reload(null, false);
     });
