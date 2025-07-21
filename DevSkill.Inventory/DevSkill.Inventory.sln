@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Application.Tests", "..\Tests\DevSkill.Inventory.Application.Tests\DevSkill.Inventory.Application.Tests.csproj", "{9115197D-0681-495B-AC01-10D58FF8CA41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSkill.Inventory.Worker", "DevSkill.Inventory.Worker\DevSkill.Inventory.Worker.csproj", "{43EC9DC2-BC36-44DC-B39B-50098534C420}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{9115197D-0681-495B-AC01-10D58FF8CA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9115197D-0681-495B-AC01-10D58FF8CA41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9115197D-0681-495B-AC01-10D58FF8CA41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43EC9DC2-BC36-44DC-B39B-50098534C420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43EC9DC2-BC36-44DC-B39B-50098534C420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43EC9DC2-BC36-44DC-B39B-50098534C420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43EC9DC2-BC36-44DC-B39B-50098534C420}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
