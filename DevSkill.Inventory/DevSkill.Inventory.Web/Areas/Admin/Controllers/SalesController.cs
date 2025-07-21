@@ -12,13 +12,11 @@ using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Customers;
 using Newtonsoft.Json;
 using DevSkill.Inventory.Application.Features.Products.Queries;
-using DevSkill.Inventory.Application.Features.Products.Commands;
-using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Sales;
 using DevSkill.Inventory.Application.Features.Sales.Commands;
-using DevSkill.Inventory.Application.Features.Customers.Queries;
 using DevSkill.Inventory.Application.Features.AccountTypes.Queries;
 using DevSkill.Inventory.Application.Features.Accounts.Queries;
+using DevSkill.Inventory.Application.Features.Products.Commands;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -112,6 +110,32 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 return Json(DataTables.EmptyResult);
             }
         }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            try
+            {
+                await _mediator.Send(new SaleDeleteCommand() { Id = id });
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = "Sale Deleted",
+                    Type = ResponseTypes.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                string message = "Failed to delete Sale";
+                _logger.LogError(ex, message);
+                TempData.Put("ResponseMessage", new ResponseModel()
+                {
+                    Message = message,
+                    Type = ResponseTypes.Danger
+                });
+            }
+            return RedirectToAction("Index");
+        }
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCustomerAsync(AddCustomerModel model)
         {
