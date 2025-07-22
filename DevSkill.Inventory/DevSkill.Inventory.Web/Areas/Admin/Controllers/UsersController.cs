@@ -201,6 +201,126 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 });
                 return RedirectToAction("Index");
             }
+        }
+
+        public async Task<JsonResult> GetUserForUpdate(Guid id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "User not found" });
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var model = new UpdateUserModel
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    CompanyName = user.CompanyName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = roles.FirstOrDefault(),
+                    Status = user.Status
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    data = model
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user for update");
+                return Json(new { success = false, message = "An error occurred while fetching user data." });
+            }
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateUser(UpdateUserModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user = await _userManager.FindByIdAsync(model.Id.ToString());
+
+                    if (user == null)
+                    {
+                        TempData.Put("ResponseMessage", new ResponseModel
+                        {
+                            Message = "User not found",
+                            Type = ResponseTypes.Danger
+                        });
+                        return RedirectToAction("Index");
+                    }
+
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.CompanyName = model.CompanyName;
+                    user.Email = model.Email;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.Status = model.Status;
+
+                    var result = await _userManager.UpdateAsync(user);
+
+                    if (result.Succeeded)
+                    {
+                        var currentRoles = await _userManager.GetRolesAsync(user);
+                        var roleResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                        if (roleResult.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(user, model.Role);
+                        }
+
+                        if (!string.IsNullOrEmpty(model.Password))
+                        {
+                            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                            var passwordResult = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+                            if (!passwordResult.Succeeded)
+                            {
+                                TempData.Put("ResponseMessage", new ResponseModel
+                                {
+                                    Message = "Failed to update password",
+                                    Type = ResponseTypes.Danger
+                                });
+                                return RedirectToAction("Index");
+                            }
+                        }
+
+                        TempData.Put("ResponseMessage", new ResponseModel
+                        {
+                            Message = "User updated successfully",
+                            Type = ResponseTypes.Success
+                        });
+                    }
+                    else
+                    {
+                        TempData.Put("ResponseMessage", new ResponseModel
+                        {
+                            Message = "Failed to update user",
+                            Type = ResponseTypes.Danger
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating user");
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "An error occurred while updating the user.",
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return RedirectToAction("Index");
         }        
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()

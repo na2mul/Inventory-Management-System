@@ -124,5 +124,36 @@
         setTimeout(function () {
             $('#response-alert').fadeOut('slow');
         }, 4000);
-    });    
-});
+    });
+
+    $('#users').on('click', '.showUpdateModal', function () {
+        var userId = $(this).data('id');
+        $.ajax({
+            url: '/Admin/Users/GetUserForUpdate',
+            type: 'GET',
+            data: { id: userId },
+            success: function (response) {
+                if (response.success) {
+                    var user = response.data;
+                    $('#updateUserModal #Id').val(user.id);
+                    $('#updateUserModal #FirstName').val(user.firstName);
+                    $('#updateUserModal #LastName').val(user.lastName);
+                    $('#updateUserModal #CompanyName').val(user.companyName);
+                    $('#updateUserModal #Email').val(user.email);
+                    $('#updateUserModal #PhoneNumber').val(user.phoneNumber);
+                    $('#updateUserModal #Role').val(user.role);
+                    $('#updateUserModal #Status').val(user.status);
+                    $('#updateUserModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred while fetching user data.');
+            }
+        });
+    });
+    $('#update-button').click(function () {
+        $('#updateUserForm').submit();
+    });
+});  
