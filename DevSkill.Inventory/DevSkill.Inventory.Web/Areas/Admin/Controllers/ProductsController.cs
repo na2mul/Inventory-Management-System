@@ -16,10 +16,11 @@ using DevSkill.Inventory.Infrastructure.Utilities;
 using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class ProductsController : Controller
     {
         private readonly ILogger<ProductsController> _logger;
@@ -43,7 +44,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View();
         }             
        
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "AddPermission"),HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAsync(AddProductModel model)
         {
             if (ModelState.IsValid)
@@ -90,7 +91,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAsync(UpdateProductModel model)
         {
             if (ModelState.IsValid)
@@ -139,7 +140,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> StoreAsync(StoreProductModel model)
         {
             if (ModelState.IsValid)
@@ -169,7 +170,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DamageAsync(DamageProductModel model)
         {
             if (ModelState.IsValid)
@@ -199,7 +200,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "DeletePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try

@@ -67,6 +67,10 @@ try
     builder.Services.AddIdentity();
     #endregion
 
+    #region Authorization Configuration
+    builder.Services.AddPolicy();
+    #endregion
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -92,6 +96,7 @@ try
     app.UseHttpsRedirection();
     app.UseRouting();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapStaticAssets();
@@ -109,6 +114,21 @@ try
 
     app.MapRazorPages()
        .WithStaticAssets();
+
+    // Seed polyciry roles and admin user on startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            await services.SeedAdminUserAndRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while seeding the database.");
+        }
+    }
 
     app.Run();
 }

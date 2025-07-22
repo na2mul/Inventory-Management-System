@@ -26,7 +26,7 @@ namespace DevSkill.Inventory.Infrastructure.Utilities
             message.To.Add(new MailboxAddress(receiverName, receiverEmail));
             message.Subject = subject;
 
-            message.Body = new TextPart("plain")
+            message.Body = new TextPart("html")
             {
                 Text = body
             };

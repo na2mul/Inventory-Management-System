@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Web;
 using DevSkill.Inventory.Web.Areas.Admin.Models.TransferAccounts;
 using DevSkill.Inventory.Application.Features.TransferAccounts.Commands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class TransferAccountsController : Controller
     {
         private readonly ILogger<TransferAccountsController> _logger;
@@ -32,7 +33,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View();
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "AddPermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAsync(AddTransferAccountModel model)
         {
             if (ModelState.IsValid)
@@ -96,7 +97,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "DeletePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try

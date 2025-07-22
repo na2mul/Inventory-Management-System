@@ -84,11 +84,10 @@ namespace DevSkill.Inventory.Infrastructure
                       .WithMany()
                       .HasForeignKey(e => e.ToAccountId)
                       .OnDelete(DeleteBehavior.Restrict);
-            });
+            });            
 
-            builder.Entity<ApplicationRole>().HasData(RoleSeed.GetRoles());
-            //builder.Entity<ApplicationUserClaim>().HasData(ClaimSeed.GetClaims());
-
+            builder.Entity<ApplicationRole>().HasData(RoleSeed.GetRoles());                      
+           
             base.OnModelCreating(builder);
         }
     }

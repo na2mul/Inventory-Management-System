@@ -21,24 +21,21 @@ namespace DevSkill.Inventory.Web.Controllers
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailUtility _emailUtility;
         private readonly ICreateUserService _CreateUserService;
-        private readonly IEmailStoreAccessorService _emailStoreAccessorService;
-
         public AccountController(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailUtility emailUtility,
-            ICreateUserService createUserService,
-            IEmailStoreAccessorService emailStoreAccessorService)
+            ICreateUserService createUserService)
         {
             _userManager = userManager;
             _userStore = userStore;
+            _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
             _emailUtility = emailUtility;
             _CreateUserService = createUserService;
-            _emailStoreAccessorService = emailStoreAccessorService;
         }
 
         [AllowAnonymous]
@@ -66,24 +63,24 @@ namespace DevSkill.Inventory.Web.Controllers
                 user.LastName = model.LastName;
                 var result = await _userManager.CreateAsync(user, model.Password);
                 await _userManager.AddToRoleAsync(user, "PublicUser");
-                //await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("age",
-                //    (DateTime.UtcNow.Subtract(model.DateOfBirth).Days / 365).ToString()));
+                await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("age",
+                    (DateTime.UtcNow.Subtract(model.DateOfBirth).Days / 365).ToString()));
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    //var callbackUrl = Url.Action(
-                    //    "ConfirmEmail",
-                    //    "Account",
-                    //    values: new { area = "", userId = user.Id, code = code, returnUrl = model.ReturnUrl },
-                    //    protocol: Request.Scheme);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Action(
+                        "ConfirmEmail",
+                        "Account",
+                        values: new { area = "", userId = user.Id, code = code, returnUrl = model.ReturnUrl },
+                        protocol: Request.Scheme);
 
-                    //_emailUtility.SendEmail(model.Email, $"{model.FirstName} {model.LastName}", "Confirm your email",
-                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    _emailUtility.SendEmail(model.Email, $"{model.FirstName} {model.LastName}", "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -172,6 +169,15 @@ namespace DevSkill.Inventory.Web.Controllers
         public IActionResult AccessDenied()
         {
             return View();
-        }            
+        }
+        public IUserEmailStore<ApplicationUser> GetEmailStore()
+        {
+            if (!_userManager.SupportsUserEmail)
+            {
+                throw new NotSupportedException("The default UI requires a user store with email support.");
+            }
+
+            return (IUserEmailStore<ApplicationUser>)_userStore;
+        }
     }
 }

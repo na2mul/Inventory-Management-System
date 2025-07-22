@@ -12,10 +12,11 @@ using DevSkill.Inventory.Application.Features.Customers.Commands;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Exceptions;
 using DevSkill.Inventory.Application.Features.Products.Queries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class CustomersController : Controller
     {
         private readonly ILogger<CustomersController> _logger;
@@ -39,7 +40,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View();
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "AddPermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAsync(AddCustomerModel model)
         {
             if (ModelState.IsValid)
@@ -81,7 +82,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAsync(UpdateCustomerModel model)
         {
             if (ModelState.IsValid)
@@ -197,7 +198,7 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             }
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Policy = "DeletePermission"), HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try

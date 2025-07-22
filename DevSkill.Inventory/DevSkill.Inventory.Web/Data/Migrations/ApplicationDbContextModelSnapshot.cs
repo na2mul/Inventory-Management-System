@@ -38,7 +38,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasIndex("AccountTypeId");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.AccountType", b =>
@@ -53,7 +53,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AccountTypes");
+                    b.ToTable("AccountTypes", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Category", b =>
@@ -70,7 +70,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Customer", b =>
@@ -105,7 +105,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.MeasurementUnit", b =>
@@ -119,7 +119,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MeasurementUnit");
+                    b.ToTable("MeasurementUnit", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Product", b =>
@@ -170,7 +170,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasIndex("MeasurementUnitId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Sale", b =>
@@ -224,7 +224,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Sales");
+                    b.ToTable("Sales", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.SalesDetail", b =>
@@ -265,7 +265,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasIndex("SalesId");
 
-                    b.ToTable("SalesDetails");
+                    b.ToTable("SalesDetails", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.TransferAccount", b =>
@@ -295,7 +295,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
                     b.HasIndex("ToAccountId");
 
-                    b.ToTable("TransferAccounts");
+                    b.ToTable("TransferAccounts", (string)null);
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationRole", b =>

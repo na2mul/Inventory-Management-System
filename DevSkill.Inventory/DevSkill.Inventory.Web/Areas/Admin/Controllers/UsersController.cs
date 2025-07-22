@@ -7,6 +7,7 @@ using DevSkill.Inventory.Infrastructure.UserService;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ using System.Web;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize(Policy = "UserAddPermission")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -23,21 +24,17 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<UsersController> _logger;
         private readonly ICreateUserService _createUserService;
-        private readonly IEmailStoreAccessorService _emailStoreAccessorService;
         public UsersController(UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             IMediator mediator,
             ILogger<UsersController> logger,
-            ICreateUserService createUserService,
-            IEmailStoreAccessorService emailStoreAccessorService)
+            ICreateUserService createUserService)
         {
             _userManager = userManager;
             _userStore = userStore;
             _mediator = mediator;
             _logger = logger;
             _createUserService = createUserService;
-            _emailStoreAccessorService = emailStoreAccessorService;
-
         }
         public async Task<IActionResult> Index()
         {
