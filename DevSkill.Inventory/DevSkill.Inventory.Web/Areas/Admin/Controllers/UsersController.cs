@@ -23,18 +23,21 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<UsersController> _logger;
         private readonly ICreateUserService _createUserService;
+        private readonly IEmailStoreAccessorService _emailStoreAccessorService;
         public UsersController(UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             IMediator mediator,
             ILogger<UsersController> logger,
-            ICreateUserService createUserService)
+            ICreateUserService createUserService,
+            IEmailStoreAccessorService emailStoreAccessorService)
         {
             _userManager = userManager;
             _userStore = userStore;
-            _emailStore = GetEmailStore();
             _mediator = mediator;
             _logger = logger;
             _createUserService = createUserService;
+            _emailStoreAccessorService = emailStoreAccessorService;
+
         }
         public async Task<IActionResult> Index()
         {
@@ -321,15 +324,6 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }
             }
             return RedirectToAction("Index");
-        }        
-
-        private IUserEmailStore<ApplicationUser> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
-            {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
-            return (IUserEmailStore<ApplicationUser>)_userStore;
-        }
+        }            
     }
 }

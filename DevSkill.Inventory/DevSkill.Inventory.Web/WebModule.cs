@@ -44,6 +44,7 @@ namespace DevSkill.Inventory.Web
             builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
             builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
             builder.RegisterType<CreateUserService>().As<ICreateUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailStoreAccessorService>().As<IEmailStoreAccessorService>().InstancePerLifetimeScope();           
 
             builder.RegisterType<ProductAddCommand>().AsSelf();
 
