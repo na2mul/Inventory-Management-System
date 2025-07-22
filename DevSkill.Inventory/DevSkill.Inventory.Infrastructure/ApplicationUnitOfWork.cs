@@ -24,6 +24,7 @@ namespace DevSkill.Inventory.Infrastructure
         public IAccountTypeRepository AccountTypeRepository { get; set; }
         public IAccountRepository AccountRepository { get; set; }
         public ITransferAccountRepository TransferAccountRepository { get; set; }
+        public IUserRepository UserRepository { get; set; }
 
         public ApplicationUnitOfWork(
             ApplicationDbContext context,
@@ -34,7 +35,9 @@ namespace DevSkill.Inventory.Infrastructure
             ISaleRepository saleRepository,
             IAccountTypeRepository accountTypeRepository,
             IAccountRepository accountRepository,
-            ITransferAccountRepository transferAccountRepository
+            ITransferAccountRepository transferAccountRepository,
+            IUserRepository UserRepository
+
             ) : base(context)
         {
             _dbContext = context;
@@ -46,6 +49,8 @@ namespace DevSkill.Inventory.Infrastructure
             AccountTypeRepository = accountTypeRepository;
             AccountRepository = accountRepository;
             TransferAccountRepository = transferAccountRepository;
+            UserRepository = UserRepository;
+
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

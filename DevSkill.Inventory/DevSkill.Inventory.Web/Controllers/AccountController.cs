@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
+using DevSkill.Inventory.Infrastructure.UserService;
 
 namespace DevSkill.Inventory.Web.Controllers
 {
@@ -19,13 +20,15 @@ namespace DevSkill.Inventory.Web.Controllers
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailUtility _emailUtility;
+        private readonly ICreateUserService _CreateUserService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailUtility emailUtility)
+            IEmailUtility emailUtility,
+            ICreateUserService createUserService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -33,9 +36,10 @@ namespace DevSkill.Inventory.Web.Controllers
             _signInManager = signInManager;
             _logger = logger;
             _emailUtility = emailUtility;
+            _CreateUserService = createUserService;
         }
 
-        
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync(string? returnUrl = null)
         {
             var model = new RegisterModel();
@@ -44,14 +48,14 @@ namespace DevSkill.Inventory.Web.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterAsync(RegisterModel model)
         {
             model.ReturnUrl ??= Url.Content("/Admin/Dashboard");
             model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = _CreateUserService.CreateUser();
 
                 await _userStore.SetUserNameAsync(user, model.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
@@ -59,7 +63,7 @@ namespace DevSkill.Inventory.Web.Controllers
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 var result = await _userManager.CreateAsync(user, model.Password);
-                //await _userManager.AddToRoleAsync(user, "Product");
+                await _userManager.AddToRoleAsync(user, "PublicUser");
                 //await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("age",
                 //    (DateTime.UtcNow.Subtract(model.DateOfBirth).Days / 365).ToString()));
 
@@ -68,16 +72,16 @@ namespace DevSkill.Inventory.Web.Controllers
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Action(
-                        "ConfirmEmail",
-                        "Account",
-                        values: new { area = "", userId = user.Id, code = code, returnUrl = model.ReturnUrl },
-                        protocol: Request.Scheme);
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    //var callbackUrl = Url.Action(
+                    //    "ConfirmEmail",
+                    //    "Account",
+                    //    values: new { area = "", userId = user.Id, code = code, returnUrl = model.ReturnUrl },
+                    //    protocol: Request.Scheme);
 
-                    _emailUtility.SendEmail(model.Email, $"{model.FirstName} {model.LastName}", "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    //_emailUtility.SendEmail(model.Email, $"{model.FirstName} {model.LastName}", "Confirm your email",
+                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -97,6 +101,7 @@ namespace DevSkill.Inventory.Web.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> LoginAsync(string returnUrl = null)
         {
             var model = new LoginModel();
@@ -116,7 +121,7 @@ namespace DevSkill.Inventory.Web.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginAsync(LoginModel model)
         {
             model.ReturnUrl ??= Url.Content("/Admin/Dashboard");
@@ -151,6 +156,7 @@ namespace DevSkill.Inventory.Web.Controllers
             return View(model);
         }
 
+        [Authorize]
         public async Task<IActionResult> LogoutAsync(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
@@ -164,21 +170,7 @@ namespace DevSkill.Inventory.Web.Controllers
         public IActionResult AccessDenied()
         {
             return View();
-        }
-
-        private ApplicationUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<ApplicationUser>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
-        }
+        }       
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {

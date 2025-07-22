@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "User";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+}
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Users</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Users</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content Header-->
+
+<div class="card-header">
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            <!-- Optional content -->
+        </div>
+        <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">            
+            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-plus me-1"></i>New User
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">               
+                <!-- Users Table -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">Available Users</h3>
+                    </div>
+
+                    <div class="card-body table-responsive px-4">
+                        <partial name="./_Add" />
+                        <partial name="./_Update" />
+                        <partial name="_ResponsePartial" />
+                        <partial name="_DeleteModalPartial" />
+
+                        <table id="users" class="table table-bordered table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th>#SN.</th>
+                                    <th>Employee</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Role</th>
+                                    <th>Status</th>                                    
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>#SN.</th>
+                                    <th>Employee</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- /Users Table -->
+
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+
+    </div> <!-- /.container-fluid -->
+</div> <!-- /.app-content -->
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <!-- Buttons JS + dependencies -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="~/js/userIndex.js"></script>
+}

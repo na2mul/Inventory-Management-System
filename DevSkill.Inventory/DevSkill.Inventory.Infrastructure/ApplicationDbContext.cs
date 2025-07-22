@@ -1,5 +1,6 @@
 ﻿using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Infrastructure.Identity;
+using DevSkill.Inventory.Infrastructure.Seeds;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -85,6 +86,8 @@ namespace DevSkill.Inventory.Infrastructure
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<ApplicationRole>().HasData(RoleSeed.GetRoles());
+            //builder.Entity<ApplicationUserClaim>().HasData(ClaimSeed.GetClaims());
 
             base.OnModelCreating(builder);
         }

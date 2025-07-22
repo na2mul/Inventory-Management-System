@@ -4,6 +4,7 @@ using DevSkill.Inventory.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DevSkill.Inventory.Web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721153623_UpdateAspnetUsers")]
+    partial class UpdateAspnetUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -324,29 +327,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("5005cc5d-736d-4f70-98d0-903749a52b86"),
-                            ConcurrencyStamp = "19-Apr-25 1:02:01 AM",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("28b143bc-7eba-48e0-985f-ad23853d34f8"),
-                            ConcurrencyStamp = "19-Apr-25 1:02:03 AM",
-                            Name = "HR",
-                            NormalizedName = "HR"
-                        },
-                        new
-                        {
-                            Id = new Guid("77fb31ec-afc0-44e1-acdc-16d14631d805"),
-                            ConcurrencyStamp = "19-Apr-25 1:02:04 AM",
-                            Name = "PublicUser",
-                            NormalizedName = "PUBLICUSER"
-                        });
                 });
 
             modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationRoleClaim", b =>
@@ -510,12 +490,7 @@ namespace DevSkill.Inventory.Web.Data.Migrations
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApplicationUserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("RoleId");
 
@@ -653,10 +628,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
 
             modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationUserRole", b =>
                 {
-                    b.HasOne("DevSkill.Inventory.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany("UserRoles")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("DevSkill.Inventory.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
@@ -687,11 +658,6 @@ namespace DevSkill.Inventory.Web.Data.Migrations
             modelBuilder.Entity("DevSkill.Inventory.Domain.Entities.Sale", b =>
                 {
                     b.Navigation("SalesDetails");
-                });
-
-            modelBuilder.Entity("DevSkill.Inventory.Infrastructure.Identity.ApplicationUser", b =>
-                {
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

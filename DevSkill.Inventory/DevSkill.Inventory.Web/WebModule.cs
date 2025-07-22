@@ -7,6 +7,7 @@ using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Domain.Utilities;
 using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Infrastructure.Repositories;
+using DevSkill.Inventory.Infrastructure.UserService;
 using DevSkill.Inventory.Infrastructure.Utilities;
 using DevSkill.Inventory.Web.Models;
 
@@ -39,8 +40,10 @@ namespace DevSkill.Inventory.Web
             builder.RegisterType<AccountTypeRepository>().As<IAccountTypeRepository>().InstancePerLifetimeScope();
             builder.RegisterType<AccountRepository>().As<IAccountRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TransferAccountRepository>().As<ITransferAccountRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
             builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
             builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
+            builder.RegisterType<CreateUserService>().As<ICreateUserService>().InstancePerLifetimeScope();
 
             builder.RegisterType<ProductAddCommand>().AsSelf();
 
