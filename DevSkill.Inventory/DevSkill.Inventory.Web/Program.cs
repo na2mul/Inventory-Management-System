@@ -63,6 +63,10 @@ try
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     #endregion
 
+    #region Docker IP Correction
+    builder.WebHost.UseUrls("http://*:80");
+    #endregion
+
     #region Identity Configuration
     builder.Services.AddIdentity();
     #endregion
