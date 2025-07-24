@@ -14,18 +14,26 @@ namespace DevSkill.Inventory.Infrastructure.Utilities
         {
             if (image != null)
             {
-                var fileName = $"{Guid.NewGuid()}-{Path.GetFileName(image.FileName)}";
+                // Get file extension (default to .jpg if missing)
+                var extension = Path.GetExtension(image.FileName);
+                if (string.IsNullOrWhiteSpace(extension))
+                {
+                    extension = ".jpg";
+                }
+
+                var fileName = $"{Guid.NewGuid()}{extension}";
                 var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(stream);
                 }
-                imageUrl = Path.Combine("images", fileName);
 
-                return imageUrl;
+                return fileName; 
             }
+
             return imageUrl;
         }
+
     }
 }

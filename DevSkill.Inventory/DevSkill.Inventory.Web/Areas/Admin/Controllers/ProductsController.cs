@@ -17,6 +17,9 @@ using DevSkill.Inventory.Domain.Entities;
 using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
 using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
 using Microsoft.AspNetCore.Authorization;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using Amazon;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -27,17 +30,23 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IImageUtility _imageUtility;
+        private readonly IAmazonSQS _sqsClient;
+        private const string QueueUrl = "https://sqs.us-east-1.amazonaws.com/847888492411/Nazmul-Queue";
+        RegionEndpoint serviceRegion;
 
         public ProductsController(
             ILogger<ProductsController> logger,
             IMapper mapper,
             IMediator mediator,
-            IImageUtility imageUtility)
+            IImageUtility imageUtility,
+            IAmazonSQS sqsClient)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
             _imageUtility = imageUtility;
+            serviceRegion = RegionEndpoint.USEast1;
+            _sqsClient = new AmazonSQSClient(serviceRegion);
         }
         public async Task<IActionResult> Index()
         {            
@@ -61,6 +70,14 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     product.Id = IdentityGenerator.NewSequentialGuid();
                     await _mediator.Send(product);
+
+                    // Send ImageUrl to SQS
+                    var sendRequest = new SendMessageRequest
+                    {
+                        QueueUrl = QueueUrl,
+                        MessageBody = product.ImageUrl
+                    };
+                    await _sqsClient.SendMessageAsync(sendRequest);
 
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {

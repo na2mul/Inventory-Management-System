@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using Amazon.S3;
+using Amazon.SQS;
+using Autofac;
 
 namespace DevSkill.Inventory.Worker
 {
@@ -15,6 +17,9 @@ namespace DevSkill.Inventory.Worker
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<AmazonSQSClient>().As<IAmazonSQS>().InstancePerLifetimeScope();
+            builder.RegisterType<AmazonS3Client>().As<IAmazonS3>().InstancePerLifetimeScope();
+
             base.Load(builder);
         }
     }

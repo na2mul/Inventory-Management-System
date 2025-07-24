@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using Amazon.SQS;
+using Autofac;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Services;
 using DevSkill.Inventory.Domain;
@@ -41,6 +42,7 @@ namespace DevSkill.Inventory.Web
             builder.RegisterType<AccountRepository>().As<IAccountRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TransferAccountRepository>().As<ITransferAccountRepository>().InstancePerLifetimeScope();
             builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AmazonSQSClient>().As<IAmazonSQS>().InstancePerLifetimeScope();
             builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
             builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
             builder.RegisterType<CreateUserService>().As<ICreateUserService>().InstancePerLifetimeScope();
