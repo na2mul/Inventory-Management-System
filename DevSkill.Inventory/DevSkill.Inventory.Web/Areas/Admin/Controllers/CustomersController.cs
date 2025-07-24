@@ -13,6 +13,10 @@ using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Exceptions;
 using DevSkill.Inventory.Application.Features.Products.Queries;
 using Microsoft.AspNetCore.Authorization;
+using Amazon.SQS.Model;
+using DevSkill.Inventory.Domain.Entities;
+using Amazon.SQS;
+using Amazon;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
@@ -23,17 +27,23 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IImageUtility _imageUtility;
+        private readonly IAmazonSQS _sqsClient;
+        private const string QueueUrl = "https://sqs.us-east-1.amazonaws.com/847888492411/Nazmul-Queue";
+        RegionEndpoint serviceRegion;
 
         public CustomersController(
             ILogger<CustomersController> logger,
             IMapper mapper,
             IMediator mediator,
-            IImageUtility imageUtility)
+            IImageUtility imageUtility,
+            IAmazonSQS sqsClient)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
             _imageUtility = imageUtility;
+            serviceRegion = RegionEndpoint.USEast1;
+            _sqsClient = new AmazonSQSClient(serviceRegion);
         }
         public async Task<IActionResult> Index()
         {
@@ -52,6 +62,14 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     customer.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
                     customer.Id = IdentityGenerator.NewSequentialGuid();
                     await _mediator.Send(customer);
+
+                    // Send ImageUrl to SQS
+                    var sendRequest = new SendMessageRequest
+                    {
+                        QueueUrl = QueueUrl,
+                        MessageBody = customer.ImageUrl
+                    };
+                    await _sqsClient.SendMessageAsync(sendRequest);
 
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
