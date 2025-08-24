@@ -3,16 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DevSkill.Inventory.Domain.Entities
 {
     public class Product : IEntity<Guid>
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public int StockQuantity { get; set; }
-        public string Description { get; set; }
-        
+        public string? ImageUrl { get; set; }
+        public string? Barcode { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public Guid? CategoryId { get; set; }
+        public Category? Category { get; set; }
+        public int? PurchasePrice { get; set; }
+        public int? MRP { get; set; }
+        public int? WholesalePrice { get; set; }
+        public int? Stock { get; set; }
+        public int? LowStock { get; set; }
+        public int? DamageStock { get; set; }
+        public Guid? MeasurementUnitId { get; set; }
+        public MeasurementUnit? MeasurementUnit { get; set; }
+
     }
 }

@@ -1,11 +1,15 @@
-﻿using Autofac;
+﻿using Amazon.SQS;
+using Autofac;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Services;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Domain.Repositories;
 using DevSkill.Inventory.Domain.Services;
+using DevSkill.Inventory.Domain.Utilities;
 using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Infrastructure.Repositories;
+using DevSkill.Inventory.Infrastructure.UserService;
+using DevSkill.Inventory.Infrastructure.Utilities;
 using DevSkill.Inventory.Web.Models;
 
 namespace DevSkill.Inventory.Web
@@ -26,12 +30,23 @@ namespace DevSkill.Inventory.Web
                 .WithParameter("connectionString", _connectionString)
                 .WithParameter("migrationAssembly", _migrationAssembly)
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProductService>().As<IProductService>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProductRepository>().As<IProductRepository>()
-                .InstancePerLifetimeScope();
+            builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>().InstancePerLifetimeScope();
+            builder.RegisterType<ApplicationUnitOfWork>().As<ITransactionalUnitOfWork>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductRepository>().As<IProductRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<CategoryRepository>().As<ICategoryRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<MeasurementUnitRepository>().As<IMeasurementUnitRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerRepository>().As<ICustomerRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SaleRepository>().As<ISaleRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AccountTypeRepository>().As<IAccountTypeRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AccountRepository>().As<IAccountRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TransferAccountRepository>().As<ITransferAccountRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AmazonSQSClient>().As<IAmazonSQS>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailUtility>().As<IEmailUtility>().InstancePerLifetimeScope();
+            builder.RegisterType<ImageUtility>().As<IImageUtility>().InstancePerLifetimeScope();
+            builder.RegisterType<CreateUserService>().As<ICreateUserService>().InstancePerLifetimeScope();
+
             builder.RegisterType<ProductAddCommand>().AsSelf();
 
             base.Load(builder);

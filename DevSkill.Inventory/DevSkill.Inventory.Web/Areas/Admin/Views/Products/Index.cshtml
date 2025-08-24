@@ -1,11 +1,12 @@
-﻿@using DevSkill.Inventory.Application.Features.Products.Queries
-@model ProductGetListQuery
-@{
+﻿@{
     ViewData["Title"] = "Index";
 }
 
 @section Styles{
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />   
 }
 <!--begin::App Content Header-->
 <div class="app-content-header">
@@ -16,7 +17,7 @@
             <div class="col-sm-6"><h3 class="mb-0">Products</h3></div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Products</li>
                 </ol>
             </div>
@@ -26,170 +27,176 @@
     <!--end::Container-->
 </div>
 <!--end::App Content Header-->
-<!--begin::App Content-->
-<div class="app-content">
-    <!--begin::Container-->
-    <div class="container-fluid">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-search mr-1"></i>Search Product</h3>
 
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <!-- /.card-tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" asp-for="SearchItem.Name" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Description</label>
-                                <input type="text" asp-for="SearchItem.Description" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Price From</label>
-                                <input type="number" asp-for="SearchItem.PriceFrom" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label>Price To</label>
-                                <input type="number" asp-for="SearchItem.PriceTo" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer">
-                    <button id="searchButton" type="submit" class="btn btn-primary float-right">Search</button>
-                </div>
-            </div>
+<div class="card-header">
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            <!-- Optional content -->
         </div>
-        <!--begin::Row-->
+        <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">
+            <button type="button" class="btn btn-sm btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#damageProductModal">
+                <i class="fas fa-minus me-1"></i>Damage Product
+            </button>
+            <button type="button" class="btn btn-sm btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#storeProductModal">
+                <i class="fas fa-plus me-1"></i>Store Product
+            </button>
+            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#AddProductModal">
+                <i class="fas fa-plus me-1"></i>Add Product
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Available Products</h3></div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
+
+                <!-- Advance Search -->
+                <div class="card shadow mb-4 collapsed-card">
+                    <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center rounded-top">
+                        <h5 class="mb-0 text-dark">
+                            <i class="fas fa-search me-2 text-muted"></i>Advanced Product Search
+                        </h5>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-card-widget="collapse"
+                                title="Collapse / Expand">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>  
+                    </div>
+                    
+                    <div class="card-body bg-light-subtle px-4">
+
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Product Name</label>
+                                <input id="SearchItem_Name" name="SearchItem_Name"
+                                       class="form-control shadow-sm" placeholder="Enter product name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Category</label>
+                                <input id="SearchItem_CategoryName" name="SearchItem_CategoryName"
+                                       class="form-control shadow-sm" placeholder="Enter category name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Unit</label>
+                                <input id="SearchItem_MeasurementUnitName" name="SearchItem_MeasurementUnitName"
+                                       class="form-control shadow-sm" placeholder="Enter unit name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Barcode</label>
+                                <input id="SearchItem_Barcode" name="SearchItem_Barcode"
+                                       class="form-control shadow-sm" placeholder="Enter barcode" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">PurchasePrice From</label>
+                                <input type="number" id="SearchItem_PurchasePriceFrom" name="SearchItem_PurchasePriceFrom"
+                                       class="form-control shadow-sm" placeholder="Min PurchasePrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">PurchasePrice To</label>
+                                <input type="number" id="SearchItem_PurchasePriceTo" name="SearchItem_PurchasePriceTo"
+                                       class="form-control shadow-sm" placeholder="Max PurchasePrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Available Stock From</label>
+                                <input type="number" id="SearchItem_StockFrom" name="SearchItem_StockFrom"
+                                       class="form-control shadow-sm" placeholder="Min Stock" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Available Stock To</label>
+                                <input type="number" id="SearchItem_StockTo" name="SearchItem_StockTo"
+                                       class="form-control shadow-sm" placeholder="Max Stock" />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-3">                            
+                            <button class="btn btn-outline-secondary btn-sm" id="btnClearFilters">
+                                <i class="fas fa-broom me-1"></i>Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Advance Search card -->
+                <!-- Products Table -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">Available Products</h3>
+                    </div>
+                    
+                    <div class="card-body table-responsive px-4">
+                        <partial name="./_Add" />
+                        <partial name="./_Store" />
+                        <partial name="./_Damage" />
+                        <partial name="./_Update" />
                         <partial name="_ResponsePartial" />
-                        <partial name="_ModalPartial" />
-                        <table id = "products" class="table table-bordered">
+                        <partial name="_DeleteModalPartial" />
+
+                        <table id="products" class="table table-bordered table-hover w-100">
                             <thead>
                                 <tr>
+                                    <th>#SN.</th>
+                                    <th>Image</th>
                                     <th>Name</th>
-                                    <th>Price</th>
-                                    <th>StockQuantity</th>
-                                    <th>Description</th> 
+                                    <th>Barcode</th>
+                                    <th>Category</th>
+                                    <th>Purchase</th>
+                                    <th>MRP</th>
+                                    <th>Wholesale</th>
+                                    <th>Stock</th>
+                                    <th>Low Stock</th>
+                                    <th>Damage Stock</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
+                            <tbody></tbody>
                             <tfoot>
                                 <tr>
+                                    <th>#SN.</th>
+                                    <th>Image</th>
                                     <th>Name</th>
-                                    <th>Price</th>
-                                    <th>StockQuantity</th>
-                                    <th>Description</th>
+                                    <th>Barcode</th>
+                                    <th>Category</th>
+                                    <th>Purchase</th>
+                                    <th>MRP</th>
+                                    <th>Wholesale</th>
+                                    <th>Stock</th>
+                                    <th>Low Stock</th>
+                                    <th>Damage Stock</th>
                                     <th>Action</th>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card --> 
-            </div>
-            <!-- /.col -->
-        </div>
-        <!--end::Row-->
-    </div>
-    <!--end::Container-->
-</div>
-<!--end::App Content-->
+                <!-- /Products Table -->
+
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+
+    </div> <!-- /.container-fluid -->
+</div> <!-- /.app-content -->
 
 @section Scripts{
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
-    <script>
-        $(function () {
-            $("#products").DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                lengthChange: true,
-                autoWidth: false,
-                lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, 'All']
-                ],
-                ajax: {
-                    url: "/Admin/Products/GetProductJsonData",
-                    type: "POST",
-                    contentType: "application/json", //must be added
-                    dataType: "json", //better to add, not mandatory
-                    data: function (d) {
-                        d.SearchItem = {
-                            Name: $("#SearchItem_Name").val(),
-                            Description: $("#SearchItem_Description").val(),
-                            PriceFrom: $("#SearchItem_PriceFrom").val() === ""? null : $("#SearchItem_PriceFrom").val(),
-                            PriceTo: $("#SearchItem_PriceTo").val() === "" ? null : $("#SearchItem_PriceTo").val()
-                        };
-                        return JSON.stringify(d);
-                    },
-                },
-                columnDefs: [
-                    {
-                        orderable: false,
-                        targets: 4,
-                        render: function (data, type, row) {
-                            console.log(type);
-                            return `<button type="submit" class="btn btn-info btn-sm" onclick="window.location.href='/admin/products/update/${data}'" value='${data}'>
-                                                <i class="fas fa-pencil-alt">
-                                                </i>
-                                                Edit
-                                            </button>
-                                            <button type="submit" class="btn btn-danger btn-sm show-bs-modal" data-id='${data}' value='${data}'>
-                                                <i class="fas fa-trash">
-                                                </i>
-                                                Delete
-                                            </button>`;
-                        }
-                    }
-                ]
-            });
-
-            $('#products').on('click', '.show-bs-modal', function () {
-                let id = $(this).data("id");
-                let deleteModal = $("#modal-delete");
-                deleteModal.find('.modal-body p').text('Are you sure you want to delete this author?');
-                $('#delete-id').val(id);
-                $('#delete-form').attr('action', '/admin/products/delete');
-                deleteModal.modal('show');
-            });
-
-            $('#delete-button').click(function()
-            {
-                $('#delete-form').submit();
-            });
-
-            $("#searchButton").click(function () {
-                $('#products').DataTable().ajax.reload(null, false);
-            });
-
-        });
-    </script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <!-- Buttons JS + dependencies -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="~/js/productIndex.js"></script>   
 }
+
+
+

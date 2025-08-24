@@ -1,18 +1,17 @@
-﻿using DevSkill.Inventory.Domain.Dtos;
-using DevSkill.Inventory.Domain.Entities;
-using DevSkill.Inventory.Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DevSkill.Inventory.Domain.Repositories;
 
 namespace DevSkill.Inventory.Domain
 {
     public interface IApplicationUnitOfWork : IUnitOfWork
     {
         public IProductRepository ProductRepository { get; }
-
-        Task<(IList<Product> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize, string? order, ProductSearchDto search);
+        public ICategoryRepository CategoryRepository { get; }
+        public IMeasurementUnitRepository MeasurementUnitRepository { get; }
+        public ICustomerRepository CustomerRepository { get; }
+        public ISaleRepository SaleRepository { get; }
+        public IAccountTypeRepository AccountTypeRepository { get; }
+        public IAccountRepository AccountRepository { get; }
+        public ITransferAccountRepository TransferAccountRepository { get; }
+        public IUserRepository UserRepository { get; }
     }
 }

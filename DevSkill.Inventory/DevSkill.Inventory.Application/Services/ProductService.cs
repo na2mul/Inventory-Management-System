@@ -46,17 +46,17 @@ namespace DevSkill.Inventory.Application.Services
             return _applicationUnitOfWork.ProductRepository.GetPagedProducts(pageIndex, pageSize, order, search);
         }
 
-        public async Task<(IList<Product> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
-            string? order, ProductSearchDto search)
-        {
-            return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
-        }
+        //public async Task<(IList<ProductListDto> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
+        //    string? order, ProductSearchDto search)
+        //{
+        //    //return await _applicationUnitOfWork.GetProductsSP(pageIndex, pageSize, order, search);
+        //}
 
-        public void Update(Product author)
+        public void Update(Product product)
         {
-            if (!_applicationUnitOfWork.ProductRepository.IsNameDuplicate(author.Name, author.Id))
+            if (!_applicationUnitOfWork.ProductRepository.IsNameDuplicate(product.Name, product.Id))
             {
-                _applicationUnitOfWork.ProductRepository.Update(author);
+                _applicationUnitOfWork.ProductRepository.Update(product);
                 _applicationUnitOfWork.Save();
             }
             else

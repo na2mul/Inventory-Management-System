@@ -14,5 +14,6 @@ namespace DevSkill.Inventory.Domain.Repositories
         (IList<Product>, int, int) GetPagedProducts(int pageIndex, int pageSize, string? order, DataTablesSearch search);
         Task<(IList<Product>, int, int)> GetPagedProductsAsync(IProductGetListQuery request);
         bool IsNameDuplicate(string name, Guid? id = null);
+        Task<IList<Product>> ProductGetAllAsync();
     }
 }

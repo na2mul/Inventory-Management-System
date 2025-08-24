@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DevSkill.Inventory.Infrastructure.Extensions;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Infrastructure;
 using DevSkill.Inventory.Web;
@@ -12,6 +13,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
+using DevSkill.Inventory.Domain;
 
 #region Bootstrap Logger Configuration
 var configuration = new ConfigurationBuilder()
@@ -61,13 +63,25 @@ try
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     #endregion
 
+    #region Docker IP Correction
+    builder.WebHost.UseUrls("http://*:80");
+    #endregion
+
+    #region Identity Configuration
+    builder.Services.AddIdentity();
+    #endregion
+
+    #region Authorization Configuration
+    builder.Services.AddPolicy();
+    #endregion
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-        .AddEntityFrameworkStores<ApplicationDbContext>();
     builder.Services.AddControllersWithViews();
+    builder.Services.AddRazorPages();
+    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
     var app = builder.Build();
 
@@ -86,6 +100,7 @@ try
     app.UseHttpsRedirection();
     app.UseRouting();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapStaticAssets();
@@ -103,6 +118,21 @@ try
 
     app.MapRazorPages()
        .WithStaticAssets();
+
+    // Seed polyciry roles and admin user on startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            await services.SeedAdminUserAndRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while seeding the database.");
+        }
+    }
 
     app.Run();
 }

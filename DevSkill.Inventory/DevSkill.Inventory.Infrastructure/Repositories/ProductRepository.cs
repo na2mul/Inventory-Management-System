@@ -26,14 +26,14 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
                 return GetDynamic(null, order, null, pageIndex, pageSize, true);
             else
                 return GetDynamic(x => x.Name.Contains(search.Value) ||
-                x.Description.Contains(search.Value), order,
+                x.Category.CategoryName.Contains(search.Value), order,
                     null, pageIndex, pageSize, true);
         }
 
         public async Task<(IList<Product>, int, int)> GetPagedProductsAsync(IProductGetListQuery request)
         {
-                return await GetDynamicAsync(x => x.Name.Contains(request.Search.Value) || x.Description.Contains(request.Search.Value),
-                    request.FormatSortExpression("Name", "Price", "StockQuantity", "Description"),
+                return await GetDynamicAsync(x => x.Name.Contains(request.Search.Value) || x.Category.CategoryName.Contains(request.Search.Value),
+                    request.FormatSortExpression("Name", "PurchasePrice","Description"),
                     null,
                     request.PageIndex,
                     request.PageSize,
@@ -46,6 +46,15 @@ namespace DevSkill.Inventory.Infrastructure.Repositories
                 return GetCount(x => x.Id != id.Value && x.Name == name) > 0;
             else
                 return GetCount(x => x.Name == name) > 0;
+        }
+
+        public async Task<IList<Product>> ProductGetAllAsync()
+        {
+            return await GetAllAsync();
+        }
+        public async void GetProductBySaleTypeAsync(Guid id, int saleType)
+        {
+
         }
     }
 }

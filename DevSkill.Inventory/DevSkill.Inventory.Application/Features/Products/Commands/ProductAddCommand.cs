@@ -1,18 +1,22 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DevSkill.Inventory.Domain.Features.Products.Commands;
+using MediatR;
 
 namespace DevSkill.Inventory.Application.Features.Products.Commands
 {
-    public class ProductAddCommand : IRequest
+    public class ProductAddCommand : IRequest, IProductAddCommand
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public int StockQuantity { get; set; }
-        public string Description { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Barcode { get; set; }
+        public string? Name { get; set; }
+        public Guid? CategoryId { get; set; }
+        public Guid? MeasurementUnitId { get; set; }
+        public string? Description { get; set; }
+        public int? PurchasePrice { get; set; }
+        public int? MRP { get; set; }
+        public int? WholesalePrice { get; set; }
+        public int? Stock { get; set; }
+        public int? LowStock { get; set; }
+        public int? DamageStock { get; set; }   
     }
 }

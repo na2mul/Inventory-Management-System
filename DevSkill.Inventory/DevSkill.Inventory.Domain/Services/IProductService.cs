@@ -16,8 +16,8 @@ namespace DevSkill.Inventory.Domain.Services
         Product GetProduct(Guid id);
         (IList<Product> data, int total, int totalDisplay) GetProducts(int pageIndex, int pageSize,
             string? order, DataTablesSearch search);
-        Task<(IList<Product> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
-            string? order, ProductSearchDto search);
+        //Task<(IList<ProductListDto> data, int total, int totalDisplay)> GetProductsSP(int pageIndex, int pageSize,
+        //    string? order, ProductSearchDto search);
         void Update(Product product);
     }
 }

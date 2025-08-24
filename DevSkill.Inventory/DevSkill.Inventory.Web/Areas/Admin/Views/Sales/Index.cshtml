@@ -1,0 +1,303 @@
+﻿@using DevSkill.Inventory.Web.Areas.Admin.Models.Sales
+@{
+    ViewData["Title"] = "Sale";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <style>
+        .image-error {
+            display: block;
+            margin-top: 0.25rem;
+        }
+    </style>      
+}
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Sales</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sales</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content Header-->
+
+<div class="card-header">
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            <!-- Optional content -->
+        </div>
+        <div class="col-sm-12 col-md-2 d-flex justify-content-end align-items-center gap-2 flex-nowrap">            
+            <button type="button" class="btn btn-sm btn-info text-nowrap" data-bs-toggle="modal" data-bs-target="#addSaleModal">
+                <i class="fas fa-plus me-1"></i>New Sale
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <!-- Advance Search -->
+                <div class="card shadow mb-4 collapsed-card">
+                    <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center rounded-top">
+                        <h5 class="mb-0 text-dark">
+                            <i class="fas fa-search me-2 text-muted"></i>Advanced Sale Search
+                        </h5>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-card-widget="collapse"
+                                title="Collapse / Expand">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+
+                    <div class="card-body bg-light-subtle px-4">
+
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Sale Invoice Number</label>
+                                <input id="SearchItem_InvoiceNo" name="SearchItem_InvoiceNo"
+                                       class="form-control shadow-sm" placeholder="Enter InvoiceNo" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Customer</label>
+                                <input id="SearchItem_CustomerName" name="SearchItem_CustomerName"
+                                       class="form-control shadow-sm" placeholder="Enter customer name" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Sale Date From</label>
+                                <input type="datetime-local" id="SearchItem_SaleDateFrom" name="SearchItem_SaleDateFrom"
+                                        class="form-control shadow-sm" placeholder="Min SaleDate" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Sale Date To</label>
+                                <input type="datetime-local" id="SearchItem_SaleDateTo" name="SearchItem_SaleDateTo"
+                                       class="form-control shadow-sm" placeholder="Max SaleDate" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">TotalPrice From</label>
+                                <input type="number" id="SearchItem_TotalPriceFrom" name="SearchItem_TotalPriceFrom"
+                                       class="form-control shadow-sm" placeholder="Min TotalPrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">TotalPrice To</label>
+                                <input type="number" id="SearchItem_TotalPriceTo" name="SearchItem_TotalPriceTo"
+                                       class="form-control shadow-sm" placeholder="Max TotalPrice" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Paid</label>
+                                <input type="number" id="SearchItem_PaidAmount" name="SearchItem_PaidAmount"
+                                       class="form-control shadow-sm" placeholder="Paid Amount" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Due</label>
+                                <input type="number" id="SearchItem_DueAmount" name="SearchItem_DueAmount"
+                                       class="form-control shadow-sm" placeholder="Due Amount" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Status</label>
+                                <select id="SearchItem_Status" name="SearchItem_Status" class="form-control select2">
+                                    <option value="">All</option>
+                                    <option value="Due">Due</option>
+                                    <option value="FullPaid">Full Paid</option>
+                                    <option value="PartialPaid">Partial Paid</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button class="btn btn-outline-secondary btn-sm" id="btnClearFilters">
+                                <i class="fas fa-broom me-1"></i>Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Advance Search card -->
+                <!-- Sales Table -->
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">Available Sales</h3>
+                    </div>
+
+                    <div class="card-body table-responsive px-4">
+                        <partial name="./_Add" model='new AddSaleModel()' />
+                        <partial name ="./_AddCustomerModal" />
+                        @* <partial name="./_Update" /> *@
+                        <partial name="_ResponsePartial" />
+                        <partial name="_DeleteModalPartial" />
+
+                        <table id="sales" class="table table-bordered table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th>#SN.</th>
+                                    <th>Invoice Number</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Due</th>
+                                    <th>Status</th>                                   
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>#SN.</th>
+                                    <th>Invoice Number</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- /Sales Table -->
+
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+
+    </div> <!-- /.container-fluid -->
+</div> <!-- /.app-content -->
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <!-- Buttons JS + dependencies -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="~/js/SaleIndex.js"></script>
+    <script>
+        function openCustomerModal() {
+            var customerModal = new bootstrap.Modal(document.getElementById('addCustomerModal'));
+
+            const customerModalEl = document.getElementById('addCustomerModal');
+            customerModalEl.style.display = 'block';
+            customerModalEl.style.zIndex = '9999';
+
+            customerModal.show();
+
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                if (backdrops.length > 1) {
+                    backdrops[backdrops.length - 1].style.zIndex = '9998';
+                }
+            }, 200);
+        }
+
+        // Handle customer form submission
+        document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const form = this;
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('add-customer-button');
+
+            // Validate required fields before submission
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill all required fields.');
+                return; 
+            }
+
+            // Disable submit button
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i>&nbsp;&nbsp;Saving...';
+
+            // Get the antiforgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('@Url.Action("AddCustomer", "Sales", new { area = "Admin" })', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Success - close customer modal and update customer dropdown
+                    var customerModal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+                    customerModal.hide();
+
+                    // Add new customer to dropdown
+                    const customerSelect = document.getElementById('CustomerId');
+                    const newOption = document.createElement('option');
+                    newOption.value = data.customerId;
+                    newOption.textContent = data.customerName;
+                    newOption.selected = true;
+                    customerSelect.appendChild(newOption);
+
+                    // Show success message
+                    alert('Customer added successfully!');
+
+                    // Reset form
+                    form.reset();
+                } else {
+                    // Show error message
+                    alert('Error: ' + (data.message || 'Unknown error occurred'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the customer: ' + error.message);
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="bi bi-floppy"></i>&nbsp;&nbsp;Save';
+            });
+        });
+    </script>    
+}
+
+
+

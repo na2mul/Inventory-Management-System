@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DevSkill.Inventory.Domain;
 using DevSkill.Inventory.Application.Exceptions;
-using DevSkill.Inventory.Domain.Entities;
-using DevSkill.Inventory.Domain.Services;
 using DevSkill.Inventory.Web.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -11,42 +9,76 @@ using DevSkill.Inventory.Infrastructure;
 using MediatR;
 using DevSkill.Inventory.Application.Features.Products.Commands;
 using DevSkill.Inventory.Application.Features.Products.Queries;
-using DevSkill.Inventory.Domain.Dtos;
+using DevSkill.Inventory.Application.Features.Categories.Queries;
+using DevSkill.Inventory.Application.Features.Categories.Commands;
+using DevSkill.Inventory.Application.Features.MeasurementUnits.Queries;
+using DevSkill.Inventory.Infrastructure.Utilities;
+using DevSkill.Inventory.Domain.Entities;
+using DevSkill.Inventory.Application.Features.MeasurementUnits.Commands;
+using DevSkill.Inventory.Web.Areas.Admin.Models.Products;
+using Microsoft.AspNetCore.Authorization;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using Amazon;
 
 namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class ProductsController : Controller
     {
         private readonly ILogger<ProductsController> _logger;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IProductService _productService;
-        public ProductsController(ILogger<ProductsController> logger, IMapper mapper, IMediator mediator, IProductService productService)
+        private readonly IImageUtility _imageUtility;
+        private readonly IAmazonSQS _sqsClient;
+        private const string QueueUrl = "https://sqs.us-east-1.amazonaws.com/847888492411/Nazmul-Queue";
+        RegionEndpoint serviceRegion;
+
+        public ProductsController(
+            ILogger<ProductsController> logger,
+            IMapper mapper,
+            IMediator mediator,
+            IImageUtility imageUtility,
+            IAmazonSQS sqsClient)
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
-            _productService = productService;
+            _imageUtility = imageUtility;
+            serviceRegion = RegionEndpoint.USEast1;
+            _sqsClient = new AmazonSQSClient(serviceRegion);
         }
-        public IActionResult Index()
-        {
+        public async Task<IActionResult> Index()
+        {            
             return View();
-        }
-        public IActionResult Add()
-        {
-            var model = new ProductAddCommand();
-            return View(model);
-        }
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(ProductAddCommand model)
+        }             
+       
+        [Authorize(Policy = "AddPermission"),HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddAsync(AddProductModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    model.Id = IdentityGenerator.NewSequentialGuid();
-                    await _mediator.Send(model);
+                    var categoryId = await _mediator.Send(new EnsureCategoryExistsCommand(model.CategoryId));
+                    var measurementUnitId = await _mediator.Send(new EnsureMeasurementUnitExistsCommand(model.MeasurementUnitId));
+
+                    model.CategoryId = categoryId.ToString();
+                    model.MeasurementUnitId = measurementUnitId.ToString();
+                    var product = _mapper.Map<ProductAddCommand>(model);
+                    
+                    product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
+                    product.Id = IdentityGenerator.NewSequentialGuid();
+                    await _mediator.Send(product);
+
+                    // Send ImageUrl to SQS
+                    var sendRequest = new SendMessageRequest
+                    {
+                        QueueUrl = QueueUrl,
+                        MessageBody = product.ImageUrl
+                    };
+                    await _sqsClient.SendMessageAsync(sendRequest);
+
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
                         Message = "product Added",
@@ -64,10 +96,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to add product");
+                    string message = "Failed to add product";
+                    _logger.LogError(ex, message);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
-                        Message = "Failed to add product",
+                        Message = message,
                         Type = ResponseTypes.Danger
                     });
                 }
@@ -75,23 +108,22 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Update(Guid id)
-        {
-            var model = new ProductUpdateCommand();
-            var product = await _mediator.Send(new ProductGetQuery() { Id = id });
-            _mapper.Map(product, model);
-
-            return View(model);
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductUpdateCommand model)
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateAsync(UpdateProductModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _mediator.Send(model);
+                    var categoryId = await _mediator.Send(new EnsureCategoryExistsCommand(model.CategoryId));
+                    var measurementUnitId = await _mediator.Send(new EnsureMeasurementUnitExistsCommand(model.MeasurementUnitId));
+
+                    model.CategoryId = categoryId.ToString();
+                    model.MeasurementUnitId = measurementUnitId.ToString();
+                    var product = _mapper.Map<ProductUpdateCommand>(model);
+
+                    product.ImageUrl = await _imageUtility.UploadImage(model.Image, model.ImageUrl);
+                    await _mediator.Send(product);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
                         Message = "product Updated",
@@ -112,10 +144,11 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to update product");
+                    string message = "Failed to update product";
+                    _logger.LogError(ex, message);
                     TempData.Put("ResponseMessage", new ResponseModel()
                     {
-                        Message = "Failed to update product",
+                        Message = message,
                         Type = ResponseTypes.Danger
 
                     });
@@ -124,8 +157,68 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id)
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> StoreAsync(StoreProductModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var product = _mapper.Map<ProductStoreCommand>(model);                    
+                    await _mediator.Send(product);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "product Stored",
+                        Type = ResponseTypes.Success
+                    });
+                    return RedirectToAction("Index");
+                }                
+                catch (Exception ex)
+                {
+                    string message = "Failed to store product";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return View(model);
+        }
+
+        [Authorize(Policy = "UpdatePermission"), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DamageAsync(DamageProductModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var product = _mapper.Map<ProductDamageCommand>(model);
+                    await _mediator.Send(product);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = "damage product Stored",
+                        Type = ResponseTypes.Success
+                    });
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    string message = "Failed to store damage product";
+                    _logger.LogError(ex, message);
+                    TempData.Put("ResponseMessage", new ResponseModel()
+                    {
+                        Message = message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return View(model);
+        }
+
+        [Authorize(Policy = "DeletePermission"), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try
             {
@@ -149,22 +242,29 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public  async Task<JsonResult> GetProductJsonData([FromBody] ProductGetListQuery model)
+        public  async Task<JsonResult> GetProductJsonDataAsync([FromBody] ProductGetListQuery model)
         {
             try
-            {
+            {                
                 var (data, total, totalDisplay) = await _mediator.Send(model);
                 var products = new
                 {
-                    recordstotal = total,
-                    recordsFiltred = totalDisplay,
+                    recordsTotal = total,
+                    recordsFiltered = totalDisplay,
                     data = (from record in data
                             select new string[]
                             {
+                                record.Id.ToString(),
+                                $"<img src='{"/" + HttpUtility.HtmlDecode(record.ImageUrl ?? string.Empty)}' alt='Image' width='80' height='70'/>",
                                 HttpUtility.HtmlEncode(record.Name),
-                                record.Price.ToString(),
-                                record.StockQuantity.ToString(),
-                                HttpUtility.HtmlEncode(record.Description),
+                                HttpUtility.HtmlEncode(record.Barcode),                                
+                                HttpUtility.HtmlEncode(record.CategoryName),
+                                HttpUtility.HtmlEncode(record.PurchasePrice),
+                                HttpUtility.HtmlEncode(record.MRP),
+                                HttpUtility.HtmlEncode(record.WholesalePrice),
+                                HttpUtility.HtmlEncode(record.Stock),
+                                HttpUtility.HtmlEncode(record.LowStock),
+                                HttpUtility.HtmlEncode(record.DamageStock),
                                 record.Id.ToString()
                             }).ToArray()
                 };
@@ -175,7 +275,88 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                 _logger.LogError(ex, "there was a problem getting products");
                 return Json(DataTables.EmptyResult);
             }
+        }
+        public async Task<JsonResult> GetProductForUpdateAsync(Guid id)
+        {
+            try
+            {
+                var product = await _mediator.Send(new ProductGetQuery() { Id = id });
 
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "Product not found" });
+                }
+                var model = _mapper.Map<UpdateProductModel>(product);
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = model.Id,
+                        name = model.Name,
+                        barcode = model.Barcode,
+                        categoryId = model.CategoryId,
+                        measurementUnitId = model.MeasurementUnitId,
+                        purchasePrice = model.PurchasePrice,
+                        mrp = model.MRP,
+                        wholesalePrice = model.WholesalePrice,
+                        stock = model.Stock,
+                        lowStock = model.LowStock,
+                        damageStock = model.DamageStock,
+                        description = model.Description,
+                        imageUrl = model.ImageUrl
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting products";
+                _logger.LogError(ex, error);
+                return Json(new { success = false,message = error});
+            }
+        }
+        public async Task<IActionResult> GetCategoriesAsync()
+        {
+            try
+            {
+                var categoryList = await _mediator.Send(new CategoryGetQuery());
+                return Json(categoryList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting Categories";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
+        public async Task<IActionResult> GetMeasurementUnitsAsync()
+        {
+            try
+            {
+                var MeasurementUnitList = await _mediator.Send(new MeasurementUnitGetQuery());
+                return Json(MeasurementUnitList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting Measurement units";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
+        }
+        public async Task<IActionResult> GetProductsAsync()
+        {
+            try
+            {
+                var ProductsList = await _mediator.Send(new ProductGetAllQuery());
+                return Json(ProductsList);
+            }
+            catch (Exception ex)
+            {
+                string error = "there was a problem getting products";
+                _logger.LogError(ex, error);
+                return Json(new { success = false, message = error });
+            }
         }
     }
-}
+}      

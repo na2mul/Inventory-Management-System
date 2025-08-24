@@ -1,0 +1,123 @@
+@using DevSkill.Inventory.Web.Areas.Admin.Models.Users
+@model UpdateUserModel
+
+<!-- Modal -->
+<div class="modal fade" id="updateUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: aliceblue;">
+                <h4 class="modal-title">Update User Information</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-antiforgery="true" asp-area="Admin" asp-controller="Users" asp-action="UpdateUser" id="updateUserForm"
+                      method="POST" enctype="multipart/form-data">
+
+                    <!-- Hidden field for User ID -->
+                    <input type="hidden" id="Id" name="Id" />
+
+                    <div class="row" style="padding:20px;">
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="FirstName" class="form-label">First Name *</label>
+                            <input type="text"
+                                   asp-for="FirstName"
+                                   class="form-control"
+                                   aria-describedby="FirstNameHelp" />
+                            <div id="FirstNameHelp" class="form-text">
+                                Provide your first name
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="LastName" class="form-label">Last Name *</label>
+                            <input type="text"
+                                   asp-for="LastName"
+                                   class="form-control"
+                                   aria-describedby="LastNameHelp" />
+                            <div id="LastNameHelp" class="form-text">
+                                Provide your last name
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="CompanyName" class="form-label">Company Name *</label>
+                            <input type="text"
+                                   asp-for="CompanyName"
+                                   class="form-control"
+                                   aria-describedby="CompanyNameHelp" />
+                            <div id="CompanyNameHelp" class="form-text">
+                                Provide your company name
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="Email" class="form-label">Email *</label>
+                            <input type="email"
+                                   asp-for="Email"
+                                   class="form-control"
+                                   aria-describedby="EmailHelp" />
+                            <div id="EmailHelp" class="form-text">
+                                Provide your email
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input type="password"
+                                   asp-for="Password"
+                                   class="form-control"
+                                   aria-describedby="PasswordHelp"
+                                   placeholder="Leave blank to keep current password" />
+                            <div id="PasswordHelp" class="form-text">
+                                Leave blank to keep current password
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password"
+                                   asp-for="ConfirmPassword"
+                                   class="form-control"
+                                   aria-describedby="ConfirmPasswordHelp"
+                                   placeholder="Leave blank to keep current password" />
+                            <div id="ConfirmPasswordHelp" class="form-text">
+                                Confirm your new password
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="PhoneNumber" class="form-label">Mobile Number</label>
+                            <input type="text"
+                                   asp-for="PhoneNumber"
+                                   class="form-control"
+                                   aria-describedby="PhoneHelp" />
+                            <div id="PhoneHelp" class="form-text">
+                                Provide your mobile number
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="Role" class="form-label">Role *</label>
+                            <select asp-for="Role" class="form-control select2 user-select">
+                                <option value="">Select a Role *</option>
+                                <option value="Admin">Admin</option>
+                                <option value="HR">HR</option>
+                                <option value="PublicUser">Public User</option>
+                                <option value="Salesman">Salesman</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-12 col-12">
+                            <label asp-for="Status" class="form-label">Status *</label>
+                            <select asp-for="Status" class="form-control select2">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: aliceblue;">
+                <button type="button" class="btn btn-secondary btn-danger" data-bs-dismiss="modal">
+                    <i class="bi bi-x-square"></i>&nbsp;&nbsp;Cancel
+                </button>
+                <button type="submit" id="add-button" class="btn btn-primary" form="updateUserForm">
+                    <i class="bi bi-floppy"></i>&nbsp;&nbsp;Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
