@@ -27,23 +27,24 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IImageUtility _imageUtility;
-        private readonly IAmazonSQS _sqsClient;
-        private const string QueueUrl = "https://sqs.us-east-1.amazonaws.com/847888492411/Nazmul-Queue";
-        RegionEndpoint serviceRegion;
+        //private readonly IAmazonSQS _sqsClient;
+        //private const string QueueUrl = "https://sqs.us-east-1.amazonaws.com/847888492411/Nazmul-Queue";
+        //RegionEndpoint serviceRegion;
 
         public CustomersController(
             ILogger<CustomersController> logger,
             IMapper mapper,
             IMediator mediator,
-            IImageUtility imageUtility,
-            IAmazonSQS sqsClient)
+            IImageUtility imageUtility
+            //IAmazonSQS sqsClient
+            )
         {
             _logger = logger;
             _mapper = mapper;
             _mediator = mediator;
             _imageUtility = imageUtility;
-            serviceRegion = RegionEndpoint.USEast1;
-            _sqsClient = new AmazonSQSClient(serviceRegion);
+            //serviceRegion = RegionEndpoint.USEast1;
+            //_sqsClient = new AmazonSQSClient(serviceRegion);
         }
         public async Task<IActionResult> Index()
         {
@@ -64,18 +65,18 @@ namespace DevSkill.Inventory.Web.Areas.Admin.Controllers
                     await _mediator.Send(customer);
 
                     // Send ImageUrl to SQS
-                    var sendRequest = new SendMessageRequest
-                    {
-                        QueueUrl = QueueUrl,
-                        MessageBody = customer.ImageUrl
-                    };
-                    await _sqsClient.SendMessageAsync(sendRequest);
+                    //var sendRequest = new SendMessageRequest
+                    //{
+                    //    QueueUrl = QueueUrl,
+                    //    MessageBody = customer.ImageUrl
+                    //};
+                    //await _sqsClient.SendMessageAsync(sendRequest);
 
-                    TempData.Put("ResponseMessage", new ResponseModel()
-                    {
-                        Message = "customer Added",
-                        Type = ResponseTypes.Success
-                    });
+                    //TempData.Put("ResponseMessage", new ResponseModel()
+                    //{
+                    //    Message = "customer Added",
+                    //    Type = ResponseTypes.Success
+                    //});
                 }
                 catch (DuplicateCustomerNameException de)
                 {
